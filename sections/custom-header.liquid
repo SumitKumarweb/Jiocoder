@@ -69,13 +69,18 @@
         class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-20 h-20 flex items-center justify-between gap-8"
       >
         <div class="flex items-center gap-2 shrink-0">
-          <div class="bg-accent-green p-1.5 rounded-lg">
-            <span
-              class="material-symbols-outlined text-primary text-2xl font-bold"
-              >keyboard</span
-            >
-          </div>
-          <h1 class="text-2xl font-extrabold tracking-tight">ElectroCart</h1>
+          {% if section.settings.logo != blank %}
+            <div class="bg-accent-green p-1.5 rounded-lg">
+              <img 
+                src="{{ section.settings.logo | image_url: width: 40 }}"
+                alt="{{ shop.name }}"
+                width="40"
+                height="40"
+                class="w-8 h-8 object-contain"
+              >
+            </div>
+          {% endif %}
+          <h1 class="text-2xl font-extrabold tracking-tight">JioCoder</h1>
         </div>
         <div
           class="flex-1 max-w-3xl md:flex items-center relative z-[60] search-container"
@@ -627,6 +632,11 @@
       "type": "text",
       "id": "title",
       "label": "Title"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
     }
   ],
   "presets": [
