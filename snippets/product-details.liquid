@@ -1,0 +1,269 @@
+{%- liquid
+  # Use passed product or default to product object
+  if product == blank
+    assign product = product
+  endif
+  
+  if product != blank
+    assign selected_variant = product.selected_or_first_available_variant
+    assign current_price = selected_variant.price
+    assign compare_at_price = selected_variant.compare_at_price
+    assign discount_percentage = 0
+    if compare_at_price > current_price
+      assign discount_percentage = compare_at_price | minus: current_price | times: 100.0 | divided_by: compare_at_price | round
+    endif
+    assign featured_image = product.featured_image | default: product.images.first
+  endif
+-%}
+
+{% if product != blank %}
+
+{%- if product.variants.size > 1 -%}
+  {%- capture initial_options -%}
+    {
+      {%- for option in product.options_with_values -%}
+        {%- unless forloop.first -%},{%- endunless -%}
+        "{{ option.name | json }}": {{ option.selected_value | json }}
+      {%- endfor -%}
+    }
+  {%- endcapture -%}
+{%- endif -%}
+
+<div 
+  class="grid grid-cols-1 lg:grid-cols-12 gap-12"
+  data-product-id="{{ product.id }}"
+  data-product-variants="{{ product.variants | json | escape }}"
+  data-product-options="{{ product.options_with_values | json | escape }}"
+  {% if initial_options != blank %}data-initial-options="{{ initial_options | escape }}"{% endif %}
+>
+  <div class="lg:col-span-7 space-y-4">
+    {% if featured_image %}
+      <div
+        class="aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 dark:border-slate-800 group relative"
+      >
+        <img
+          alt="{{ product.title | escape }}"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-zoom-in"
+          src="{{ featured_image | image_url: width: 1200 }}"
+          width="{{ featured_image.width | default: 1200 }}"
+          height="{{ featured_image.height | default: 900 }}"
+          loading="eager"
+        />
+        {% if product.metafields.custom.badge_label != blank %}
+          <div
+            class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm"
+          >
+            {{ product.metafields.custom.badge_label }}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+    
+    {% if product.images.size > 1 %}
+      <div class="grid grid-cols-5 gap-4">
+        {% for image in product.images limit: 4 %}
+          <button
+            class="aspect-square rounded-lg border-2 {% if forloop.first %}border-primary{% else %}border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100 transition-opacity{% endif %} overflow-hidden"
+            data-image-index="{{ forloop.index0 }}"
+          >
+            <img
+              alt="{{ product.title | escape }} - Image {{ forloop.index }}"
+              class="w-full h-full object-cover"
+              src="{{ image | image_url: width: 200 }}"
+              width="{{ image.width | default: 200 }}"
+              height="{{ image.height | default: 200 }}"
+              loading="lazy"
+            />
+          </button>
+        {% endfor %}
+        {% if product.media.size > 4 %}
+          <button
+            class="aspect-square rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden opacity-60 hover:opacity-100 transition-opacity flex items-center justify-center bg-slate-50"
+          >
+            <span class="material-symbols-outlined text-slate-400">play_circle</span>
+          </button>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+  
+  <div class="lg:col-span-5 space-y-6">
+    <div>
+      <h1 class="text-3xl font-extrabold text-primary leading-tight mb-2">
+        {{ product.title }}
+      </h1>
+      {% if product.metafields.reviews.rating.value != blank %}
+        {% assign rating = product.metafields.reviews.rating.value | times: 1.0 %}
+        {% assign review_count = product.metafields.reviews.rating_count.value | default: 0 %}
+        <div class="flex items-center gap-4">
+          <div class="flex items-center text-amber-500">
+            {% assign rating_int = rating | floor %}
+            {% assign next_star = rating_int | plus: 1 %}
+            {% assign has_half = rating | minus: rating_int %}
+            {% for i in (1..5) %}
+              {% if i <= rating_int %}
+                <span class="material-symbols-outlined fill-1">star</span>
+              {% elsif i == next_star and has_half > 0.25 %}
+                <span class="material-symbols-outlined">star_half</span>
+              {% else %}
+                <span class="material-symbols-outlined">star</span>
+              {% endif %}
+            {% endfor %}
+            {% if review_count > 0 %}
+              <span class="ml-2 text-sm font-semibold text-slate-600 underline">{{ review_count }} reviews</span>
+            {% endif %}
+          </div>
+          <span class="h-4 w-px bg-slate-300"></span>
+          <span class="text-emerald-600 text-sm font-bold flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">check_circle</span>
+            {% if selected_variant.available %}
+              In Stock
+            {% else %}
+              Out of Stock
+            {% endif %}
+          </span>
+        </div>
+      {% endif %}
+    </div>
+    
+    <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl space-y-4 shadow-sm">
+      <div class="flex items-baseline gap-3">
+        <span class="text-4xl font-black text-primary">{{ current_price | money }}</span>
+        {% if compare_at_price > current_price %}
+          <span class="text-lg text-slate-400 line-through">{{ compare_at_price | money }}</span>
+          <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded">
+            {{ discount_percentage }}% OFF
+          </span>
+        {% endif %}
+      </div>
+      <p class="text-sm text-slate-500">
+        Inclusive of all taxes. Free express shipping.
+      </p>
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="material-symbols-outlined text-primary text-lg">local_shipping</span>
+          <span class="text-sm font-semibold">Delivery Estimate</span>
+        </div>
+        <div class="flex gap-2">
+          <input
+            class="flex-1 px-4 py-2 text-sm border border-slate-200 rounded-lg focus:ring-primary focus:border-primary"
+            placeholder="Enter Pincode"
+            type="text"
+            id="pincode-input"
+          />
+          <button
+            class="px-4 py-2 text-sm font-bold text-primary border border-primary rounded-lg hover:bg-primary/5"
+            id="check-pincode"
+          >
+            Check
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    {% if product.variants.size > 1 %}
+      <div class="space-y-4">
+        {% for option in product.options_with_values %}
+          <div>
+            <p class="text-sm font-bold mb-3 uppercase tracking-wider text-slate-500">
+              {{ option.name }}
+            </p>
+            <div class="flex gap-3 flex-wrap">
+              {% for value in option.values %}
+                <button
+                  type="button"
+                  class="variant-option-btn px-4 py-2 rounded-lg border {% if option.selected_value == value %}border-2 border-primary bg-primary/5 text-sm font-bold text-primary{% else %}border-slate-200 text-sm font-bold hover:border-primary transition-colors{% endif %}"
+                  data-option-name="{{ option.name }}"
+                  data-option-value="{{ value }}"
+                  data-option-position="{{ option.position }}"
+                >
+                  {{ value }}
+                </button>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    <div>
+      <p class="text-sm font-bold mb-3 uppercase tracking-wider text-slate-500">
+        Quantity
+      </p>
+      <div class="flex items-center border border-slate-200 dark:border-slate-800 w-fit rounded-lg overflow-hidden bg-white">
+        <button class="p-2 hover:bg-slate-50" id="quantity-decrease">
+          <span class="material-symbols-outlined">remove</span>
+        </button>
+        <input
+          class="w-12 text-center border-none text-sm font-bold focus:ring-0"
+          type="number"
+          id="quantity-input"
+          value="1"
+          min="1"
+        />
+        <button class="p-2 hover:bg-slate-50" id="quantity-increase">
+          <span class="material-symbols-outlined">add</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+      <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" class="flex-1" id="add-to-cart-form">
+        <input type="hidden" name="id" value="{{ selected_variant.id }}" id="cart-variant-id" />
+        <input type="hidden" name="quantity" value="1" id="cart-quantity" />
+        <button
+          type="submit"
+          class="w-full bg-white border-2 border-primary text-primary font-bold py-4 rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center gap-2"
+          id="add-to-cart-btn"
+          {% unless selected_variant.available %}disabled{% endunless %}
+        >
+          <span class="material-symbols-outlined">shopping_cart</span>
+          Add to Cart
+        </button>
+      </form>
+      <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" class="flex-1 buy-now-form" id="buy-now-form">
+        <input type="hidden" name="id" value="{{ selected_variant.id }}" id="buy-now-variant-id" />
+        <input type="hidden" name="quantity" value="1" id="buy-now-quantity" />
+        <input type="hidden" name="return_to" value="{{ routes.checkout_url }}" />
+        <button
+          type="submit"
+          class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+          id="buy-now-btn"
+          {% unless selected_variant.available %}disabled{% endunless %}
+        >
+          <span class="material-symbols-outlined">flash_on</span>
+          Buy Now
+        </button>
+      </form>
+    </div>
+    
+    <div class="grid grid-cols-3 gap-2 pt-6">
+      {% if product.metafields.custom.warranty != blank %}
+        <div class="flex flex-col items-center text-center p-3 rounded-lg bg-slate-50 dark:bg-slate-800">
+          <span class="material-symbols-outlined text-primary mb-1">verified_user</span>
+          <span class="text-[10px] font-bold uppercase">{{ product.metafields.custom.warranty }}</span>
+        </div>
+      {% endif %}
+      {% if product.metafields.custom.return_policy != blank %}
+        <div class="flex flex-col items-center text-center p-3 rounded-lg bg-slate-50 dark:bg-slate-800">
+          <span class="material-symbols-outlined text-primary mb-1">sync</span>
+          <span class="text-[10px] font-bold uppercase">{{ product.metafields.custom.return_policy }}</span>
+        </div>
+      {% endif %}
+      {% if product.metafields.custom.delivery != blank %}
+        <div class="flex flex-col items-center text-center p-3 rounded-lg bg-slate-50 dark:bg-slate-800">
+          <span class="material-symbols-outlined text-primary mb-1">delivery_dining</span>
+          <span class="text-[10px] font-bold uppercase">{{ product.metafields.custom.delivery }}</span>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'product-details.js' | asset_url }}" defer></script>
+
+{% else %}
+  <div class="text-center py-12">
+    <p class="text-slate-500">Product not found. Please select a product in the section settings.</p>
+  </div>
+{% endif %}

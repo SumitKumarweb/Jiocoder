@@ -1,0 +1,75 @@
+{%- liquid
+  # Use passed product or default to product object
+  if product == blank
+    assign product = product
+  endif
+  
+  if product != blank
+    assign related_products = product.metafields.custom.complete_your_setup.value
+  endif
+-%}
+
+{% if product != blank %}
+
+{% if related_products != blank and related_products.size > 0 %}
+  <section class="mt-20">
+    <h2 class="text-2xl font-black mb-8 border-b-2 border-primary w-fit pb-2 uppercase tracking-tight">
+      Complete Your Setup
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% for related_product in related_products limit: 3 %}
+        {% if related_product != blank %}
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow group">
+            <div class="aspect-square rounded-lg overflow-hidden bg-slate-50 mb-4 relative">
+              {% if related_product.featured_image %}
+                <a href="{{ related_product.url }}">
+                  <img
+                    alt="{{ related_product.title | escape }}"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    src="{{ related_product.featured_image | image_url: width: 400 }}"
+                    width="{{ related_product.featured_image.width | default: 400 }}"
+                    height="{{ related_product.featured_image.height | default: 400 }}"
+                    loading="lazy"
+                  />
+                </a>
+              {% else %}
+                <div class="w-full h-full flex items-center justify-center bg-slate-100">
+                  <span class="material-symbols-outlined text-slate-400 text-4xl">image</span>
+                </div>
+              {% endif %}
+            </div>
+            <div class="space-y-2">
+              <h3 class="font-bold text-sm">
+                <a href="{{ related_product.url }}" class="hover:text-primary transition-colors">
+                  {{ related_product.title }}
+                </a>
+              </h3>
+              <div class="flex items-center justify-between">
+                <span class="font-black text-primary">
+                  {{ related_product.price | money }}
+                  {% if related_product.compare_at_price > related_product.price %}
+                    <span class="text-sm text-slate-400 line-through ml-2">
+                      {{ related_product.compare_at_price | money }}
+                    </span>
+                  {% endif %}
+                </span>
+                <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" class="inline add-to-cart-form">
+                  <input type="hidden" name="id" value="{{ related_product.selected_or_first_available_variant.id }}" />
+                  <input type="hidden" name="quantity" value="1" />
+                  <button
+                    type="submit"
+                    class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:opacity-90 flex items-center gap-1"
+                    {% unless related_product.selected_or_first_available_variant.available %}disabled{% endunless %}
+                  >
+                    <span class="material-symbols-outlined text-sm">add</span> Add
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+{% endif %}

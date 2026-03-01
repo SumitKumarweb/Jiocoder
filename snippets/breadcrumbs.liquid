@@ -1,0 +1,27 @@
+{%- liquid
+  # Use passed product or default to product object
+  if product == blank
+    assign product = product
+  endif
+  
+  assign home_url = routes.root_url
+  if product != blank
+    assign collection = product.collections.first | default: collections.all
+  else
+    assign collection = collections.all
+  endif
+-%}
+
+{% if product != blank %}
+
+<nav class="flex items-center gap-2 text-sm text-slate-500 mb-8">
+  <a class="hover:text-primary" href="{{ home_url }}">Home</a>
+  {% if collection %}
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
+    <a class="hover:text-primary" href="{{ collection.url }}">{{ collection.title }}</a>
+  {% endif %}
+  <span class="material-symbols-outlined text-xs">chevron_right</span>
+  <span class="text-slate-900 dark:text-slate-100 font-medium">{{ product.title }}</span>
+</nav>
+{% endif %}
+

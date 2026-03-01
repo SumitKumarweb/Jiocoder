@@ -1,0 +1,109 @@
+{%- liquid
+  # Use passed product or default to product object
+  if product == blank
+    assign product = product
+  endif
+  
+  if product != blank
+    assign build_specs = product.metafields.custom.build_specifications.value
+    assign performance_specs = product.metafields.custom.performance_specifications.value
+  endif
+-%}
+
+{% if product != blank %}
+
+{% if build_specs != blank or performance_specs != blank %}
+  <section class="mt-20">
+    <h2 class="text-2xl font-black mb-8 border-b-2 border-primary w-fit pb-2 uppercase tracking-tight">
+      Technical Specifications
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      {% if build_specs != blank %}
+        <div class="space-y-4">
+          <div class="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+            <h3 class="font-bold mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">keyboard</span>
+              Build &amp; Layout
+            </h3>
+            <dl class="space-y-3 text-sm">
+              {% if build_specs.form_factor != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Form Factor</dt>
+                  <dd class="font-semibold">{{ build_specs.form_factor }}</dd>
+                </div>
+              {% endif %}
+              {% if build_specs.chassis != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Chassis</dt>
+                  <dd class="font-semibold">{{ build_specs.chassis }}</dd>
+                </div>
+              {% endif %}
+              {% if build_specs.keycaps != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Keycaps</dt>
+                  <dd class="font-semibold">{{ build_specs.keycaps }}</dd>
+                </div>
+              {% endif %}
+              {% if build_specs.dimensions != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Dimensions</dt>
+                  <dd class="font-semibold">{{ build_specs.dimensions }}</dd>
+                </div>
+              {% endif %}
+              {% if build_specs.weight != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Weight</dt>
+                  <dd class="font-semibold">{{ build_specs.weight }}</dd>
+                </div>
+              {% endif %}
+            </dl>
+          </div>
+        </div>
+      {% endif %}
+      
+      {% if performance_specs != blank %}
+        <div class="space-y-4">
+          <div class="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+            <h3 class="font-bold mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">settings_input_component</span>
+              Performance
+            </h3>
+            <dl class="space-y-3 text-sm">
+              {% if performance_specs.switch_type != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Switch Type</dt>
+                  <dd class="font-semibold text-primary">{{ performance_specs.switch_type }}</dd>
+                </div>
+              {% endif %}
+              {% if performance_specs.actuation != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Actuation</dt>
+                  <dd class="font-semibold">{{ performance_specs.actuation }}</dd>
+                </div>
+              {% endif %}
+              {% if performance_specs.response_time != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Response Time</dt>
+                  <dd class="font-semibold">{{ performance_specs.response_time }}</dd>
+                </div>
+              {% endif %}
+              {% if performance_specs.polling_rate != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Polling Rate</dt>
+                  <dd class="font-semibold">{{ performance_specs.polling_rate }}</dd>
+                </div>
+              {% endif %}
+              {% if performance_specs.durability != blank %}
+                <div class="flex justify-between py-2 border-b border-slate-50 dark:border-slate-800">
+                  <dt class="text-slate-500">Durability</dt>
+                  <dd class="font-semibold">{{ performance_specs.durability }}</dd>
+                </div>
+              {% endif %}
+            </dl>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+{% endif %}

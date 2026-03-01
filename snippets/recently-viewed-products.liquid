@@ -1,0 +1,185 @@
+<section class="mt-20" id="recently-viewed-section">
+  <div class="flex items-center justify-between mb-8 border-b-2 border-primary/10">
+    <h2 class="text-2xl font-black border-b-2 border-primary w-fit pb-2 uppercase tracking-tight">
+      Recently Viewed
+    </h2>
+    <div class="flex gap-2 mb-2">
+      <button
+        class="p-2 border border-slate-200 dark:border-slate-800 rounded-full hover:bg-white dark:hover:bg-slate-800 transition-colors"
+        id="prev-recently-viewed"
+        style="display: none;"
+      >
+        <span class="material-symbols-outlined text-sm">chevron_left</span>
+      </button>
+      <button
+        class="p-2 border border-slate-200 dark:border-slate-800 rounded-full hover:bg-white dark:hover:bg-slate-800 transition-colors"
+        id="next-recently-viewed"
+        style="display: none;"
+      >
+        <span class="material-symbols-outlined text-sm">chevron_right</span>
+      </button>
+    </div>
+  </div>
+  <div class="flex gap-6 overflow-x-auto pb-6 scrollbar-hide -mx-4 px-4" id="recently-viewed-container">
+    <div class="text-center text-slate-500 py-8 w-full" id="recently-viewed-empty">
+      <p>No recently viewed products yet.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    const MAX_PRODUCTS = 3;
+    const STORAGE_KEY = 'recently_viewed_products';
+    
+    // Get current product handle
+    const currentProductHandle = '{% if product != blank %}{{ product.handle }}{% endif %}';
+    
+    // Get recently viewed products from localStorage
+    function getRecentlyViewed() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) return [];
+        const products = JSON.parse(stored);
+        // Filter out current product and limit to MAX_PRODUCTS
+        return products
+          .filter(handle => handle !== currentProductHandle)
+          .slice(0, MAX_PRODUCTS);
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    // Save current product to recently viewed
+    function saveCurrentProduct() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        let products = stored ? JSON.parse(stored) : [];
+        
+        // Remove current product if it exists
+        products = products.filter(handle => handle !== currentProductHandle);
+        
+        // Add current product to the beginning
+        products.unshift(currentProductHandle);
+        
+        // Keep only last 10 products
+        products = products.slice(0, 10);
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+      } catch (e) {
+        console.error('Error saving recently viewed:', e);
+      }
+    }
+    
+    // Fetch product data from Shopify
+    async function fetchProduct(productHandle) {
+      try {
+        const response = await fetch(`/products/${productHandle}.js`);
+        if (!response.ok) return null;
+        return await response.json();
+      } catch (e) {
+        console.error('Error fetching product:', e);
+        return null;
+      }
+    }
+    
+    // Format price
+    function formatPrice(cents) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0
+      }).format(cents / 100);
+    }
+    
+    // Render product card
+    function renderProductCard(product) {
+      if (!product) return '';
+      
+      const variant = product.variants[0];
+      const image = product.featured_image || (product.images && product.images[0]);
+      const imageUrl = image ? (image.src || image) : '';
+      const price = variant ? formatPrice(variant.price) : '';
+      const comparePrice = variant && variant.compare_at_price > variant.price 
+        ? formatPrice(variant.compare_at_price) 
+        : '';
+      
+      return `
+        <div class="flex-shrink-0 w-[240px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer">
+          <a href="${product.url}">
+            <div class="aspect-square relative overflow-hidden bg-slate-50">
+              ${imageUrl ? `
+              <img
+                alt="${product.title.replace(/"/g, '&quot;')}"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                src="${imageUrl}"
+                loading="lazy"
+              />` : `
+              <div class="w-full h-full flex items-center justify-center bg-slate-100">
+                <span class="material-symbols-outlined text-slate-400 text-4xl">image</span>
+              </div>`}
+            </div>
+            <div class="p-4">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                ${product.vendor || 'Product'}
+              </p>
+              <h3 class="font-bold text-sm line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+                ${product.title}
+              </h3>
+              <div class="flex items-center justify-between">
+                <span class="font-black text-primary">${price}</span>
+                ${comparePrice ? `<span class="text-xs text-slate-400 line-through ml-2">${comparePrice}</span>` : ''}
+              </div>
+            </div>
+          </a>
+        </div>
+      `;
+    }
+    
+    // Load and display recently viewed products
+    async function loadRecentlyViewed() {
+      const container = document.getElementById('recently-viewed-container');
+      const emptyState = document.getElementById('recently-viewed-empty');
+      
+      if (!container) return;
+      
+      const productHandles = getRecentlyViewed();
+      
+      if (productHandles.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      emptyState.style.display = 'none';
+      
+      // Fetch all products
+      const products = await Promise.all(
+        productHandles.map(handle => fetchProduct(handle))
+      );
+      
+      // Filter out null results
+      const validProducts = products.filter(p => p !== null);
+      
+      if (validProducts.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      // Render products
+      container.innerHTML = validProducts
+        .map(product => renderProductCard(product))
+        .join('');
+    }
+    
+    // Save current product when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        saveCurrentProduct();
+        loadRecentlyViewed();
+      });
+    } else {
+      saveCurrentProduct();
+      loadRecentlyViewed();
+    }
+  })();
+</script>

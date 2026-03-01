@@ -1,0 +1,94 @@
+{%- liquid
+  # Get product from settings or use default product object
+  if section.settings.product != blank
+    assign current_product = section.settings.product
+  else
+    assign current_product = product
+  endif
+-%}
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+  {% if section.settings.show_breadcrumbs and current_product != blank %}
+    {% render 'breadcrumbs', product: current_product %}
+  {% endif %}
+  
+  {% if section.settings.show_product_details and current_product != blank %}
+    {% render 'product-details', product: current_product %}
+  {% endif %}
+  
+  {% if section.settings.show_technical_specifications and current_product != blank %}
+    {% render 'technical-specifications', product: current_product %}
+  {% endif %}
+  
+  {% if section.settings.show_complete_setup and current_product != blank %}
+    {% render 'complete-your-setup', product: current_product %}
+  {% endif %}
+  
+  {% if section.settings.show_reviews and current_product != blank %}
+    {% render 'reviews-section', product: current_product %}
+  {% endif %}
+  
+  {% if section.settings.show_recently_viewed %}
+    {% render 'recently-viewed-products', product: current_product %}
+  {% endif %}
+  </main>
+
+{% schema %}
+{
+  "name": "Product Page",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product",
+      "info": "Select a product to display. If not selected, will use the current product page product."
+    },
+    {
+      "type": "header",
+      "content": "Section Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "label": "Show Breadcrumbs",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_details",
+      "label": "Show Product Details",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_technical_specifications",
+      "label": "Show Technical Specifications",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_complete_setup",
+      "label": "Show Complete Your Setup",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "label": "Show Reviews Section",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recently_viewed",
+      "label": "Show Recently Viewed Products",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Page",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

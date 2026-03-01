@@ -1,0 +1,92 @@
+<div id="cart-drawer" class="cart-drawer fixed inset-0 z-50 hidden">
+  <div class="cart-drawer-overlay absolute inset-0 bg-black/40 transition-opacity duration-300"></div>
+
+  <div class="cart-drawer-panel absolute right-0 top-0 h-full w-full max-w-[450px] bg-white z-20 shadow-2xl flex flex-col border-l border-slate-200 transform translate-x-full transition-transform duration-300">
+    <div id="cart-header" class="flex items-center justify-between px-6 py-6 border-b border-slate-100">
+      <div>
+        <h2 class="text-xl font-bold text-primary">Your Cart</h2>
+        <p class="text-sm text-slate-500 font-medium" id="cart-item-count">0 items selected</p>
+      </div>
+      <button id="cart-drawer-close" class="p-2 hover:bg-slate-100 rounded-full transition-colors">
+        <span class="material-symbols-outlined text-slate-500">close</span>
+      </button>
+    </div>
+
+    <div id="free-shipping-banner" class="px-6 py-4 bg-slate-50/50 hidden">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Free Shipping Goal</span>
+        <span class="text-xs font-bold text-primary" id="shipping-remaining">₹0 to go</span>
+      </div>
+      <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+        <div class="bg-primary h-full rounded-full transition-all duration-300" id="shipping-progress" style="width: 0%"></div>
+      </div>
+      <p class="text-[11px] mt-2 text-slate-400 italic">
+        Add items worth <span id="shipping-amount">₹0</span> more for free delivery across India.
+      </p>
+    </div>
+
+    <div class="flex-1 overflow-y-auto">
+      <div id="cart-items-container" class="px-6 py-4 space-y-6">
+        <div id="cart-empty-state" class="text-center py-12">
+          <p class="text-slate-500 font-medium">Cart is empty</p>
+        </div>
+      </div>
+
+      <div id="upsell-section" class="px-6 py-8 bg-slate-50/30 border-t border-slate-100 hidden">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">
+          Frequently Bought Together
+        </h3>
+        <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-2" id="upsell-products-container">
+          <!-- Upsell products will be inserted here -->
+        </div>
+      </div>
+    </div>
+
+    <div id="cart-footer" class="p-6 border-t border-slate-100 bg-white">
+      <div class="mb-6">
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 !text-lg text-slate-400">confirmation_number</span>
+            <input
+              id="cart-discount-input"
+              class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-slate-400 outline-none transition-all"
+              placeholder="Coupon / Gift Voucher"
+              type="text"
+            />
+          </div>
+          <button id="apply-discount-btn" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-primary font-bold text-sm rounded-lg transition-colors">
+            Apply
+          </button>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="flex justify-between text-sm text-slate-500">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">₹0</span>
+        </div>
+        <div class="flex justify-between text-sm text-slate-500">
+          <span>Estimated GST (18%)</span>
+          <span id="cart-gst">₹0</span>
+        </div>
+        <div class="flex justify-between text-lg font-bold text-primary pt-2 border-t border-slate-50">
+          <span>Total Amount</span>
+          <span id="cart-total">₹0</span>
+        </div>
+      </div>
+      <a
+        href="{{ routes.cart_url }}"
+        id="checkout-btn"
+        class="w-full bg-primary text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-lg shadow-primary/10"
+      >
+        <span>Proceed to Checkout</span>
+        <span class="material-symbols-outlined !text-lg">arrow_forward</span>
+      </a>
+      <div class="mt-4 flex items-center justify-center gap-2 text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+        <span class="material-symbols-outlined !text-xs">verified_user</span>
+        Secure Checkout by ElectroCart
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
