@@ -1,0 +1,102 @@
+{% liquid
+  assign product_price = product.price_min | divided_by: 100
+  assign compare_at_price = product.compare_at_price_min | divided_by: 100
+  assign discount_percent = 0
+  if compare_at_price > product_price
+    assign discount_percent = compare_at_price | minus: product_price | times: 100 | divided_by: compare_at_price | round
+  endif
+  
+  assign product_rating = product.metafields.reviews.rating.value | default: 0
+  assign review_count = product.metafields.reviews.rating_count.value | default: 0
+  assign full_stars = product_rating | floor
+  assign next_star = full_stars | plus: 1
+  assign has_half_star = product_rating | modulo: 1 | round: 1
+%}
+
+<div
+  class="product-card bg-white dark:bg-background-dark rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:shadow-2xl hover:shadow-primary/5 transition-all group relative"
+>
+  {% if discount_percent > 0 %}
+  <div
+    class="absolute top-4 left-4 z-10 bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest"
+  >
+    -{{ discount_percent }}%
+  </div>
+  {% endif %}
+  <div
+    class="aspect-square rounded-lg bg-slate-50 dark:bg-slate-900 mb-4 overflow-hidden relative"
+  >
+    {% if product.featured_image %}
+      <a href="{{ product.url }}">
+        <img
+          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          alt="{{ product.featured_image.alt | escape }}"
+          src="{{ product.featured_image | image_url: width: 500 }}"
+          width="500"
+          height="500"
+          loading="lazy"
+        />
+      </a>
+    {% else %}
+      <div class="w-full h-full flex items-center justify-center">
+        <span class="material-symbols-outlined text-slate-400 text-4xl">image</span>
+      </div>
+    {% endif %}
+    <!-- Quick Action Overlay -->
+    <div class="absolute inset-x-0 bottom-4 px-4">
+      <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <button
+          type="submit"
+          class="add-to-cart-btn w-full bg-primary text-white py-3 rounded-xl font-bold text-sm shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
+          {% unless product.available %}disabled{% endunless %}
+        >
+          <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+          {% if product.available %}
+            Add to Cart
+          {% else %}
+            Sold Out
+          {% endif %}
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="space-y-2">
+    {% if product_rating > 0 %}
+    <div class="flex items-center gap-1 mb-1">
+      <div class="flex text-yellow-400">
+        {% for i in (1..5) %}
+          {% if i <= full_stars %}
+            <span class="material-symbols-outlined text-[16px] fill-1">star</span>
+          {% elsif i == next_star and has_half_star >= 0.5 %}
+            <span class="material-symbols-outlined text-[16px] fill-1">star_half</span>
+          {% else %}
+            <span class="material-symbols-outlined text-[16px]">star</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% if review_count > 0 %}
+        <span class="text-[11px] font-bold text-slate-400">({{ review_count }})</span>
+      {% endif %}
+    </div>
+    {% endif %}
+    <h3
+      class="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 min-h-[40px]"
+    >
+      <a href="{{ product.url }}" class="hover:text-primary transition-colors">
+        {{ product.title }}
+      </a>
+    </h3>
+    <div class="flex items-baseline gap-2">
+      <span class="text-lg font-black text-primary dark:text-white">
+        {{ product.price_min | money }}
+      </span>
+      {% if compare_at_price > product_price %}
+        <span class="text-xs font-medium text-slate-400 line-through">
+          {{ product.compare_at_price_min | money }}
+        </span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+

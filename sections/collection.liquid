@@ -1,0 +1,491 @@
+{% liquid
+  assign products_per_page = section.settings.products_per_page | default: 24
+  assign min_price = 0
+  assign max_price = 0
+  
+  if collection.products.size > 0
+    for product in collection.products
+      assign product_price = product.price_min
+      if min_price == 0 or product_price < min_price
+        assign min_price = product_price
+      endif
+      if product_price > max_price
+        assign max_price = product_price
+      endif
+    endfor
+  endif
+  
+  assign min_price_rupees = min_price | divided_by: 100
+  assign max_price_rupees = max_price | divided_by: 100
+  
+  assign vendors = collection.products | map: 'vendor' | uniq | sort
+  
+  assign has_ratings = false
+  for product in collection.products
+    if product.metafields.reviews.rating.value != blank
+      assign has_ratings = true
+      break
+    endif
+  endfor
+%}
+
+<main 
+  class="max-w-[1440px] mx-auto px-6" 
+  data-collection-id="{{ collection.id }}" 
+  data-collection-url="{{ collection.url }}"
+  style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px;"
+>
+    {% if section.settings.show_breadcrumbs %}
+    <!-- Breadcrumbs -->
+    <nav
+      class="flex items-center gap-2 text-xs font-medium text-slate-500 mb-6"
+      aria-label="Breadcrumb"
+    >
+      <a class="hover:text-primary" href="{{ routes.root_url }}">Home</a>
+      <span class="material-symbols-outlined text-sm">chevron_right</span>
+      {% if collection.parent %}
+        <a class="hover:text-primary" href="{{ collection.parent.url }}">{{ collection.parent.title }}</a>
+        <span class="material-symbols-outlined text-sm">chevron_right</span>
+      {% endif %}
+      <span class="text-primary font-bold">{{ collection.title }}</span>
+    </nav>
+    {% endif %}
+    <div class="flex gap-8 items-start">
+      {% if section.settings.show_filters %}
+      <!-- Sidebar Filters -->
+      <aside class="w-64 flex-shrink-0 sticky top-24 space-y-8">
+        {% if section.settings.show_price_filter %}
+        <div>
+          <h3
+            class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4"
+          >
+            Price Range
+          </h3>
+          <div class="px-2">
+            <input
+              id="price-range-slider"
+              class="w-full accent-primary h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+              max="{{ max_price_rupees }}"
+              min="{{ min_price_rupees }}"
+              step="100"
+              type="range"
+              value="{{ max_price_rupees }}"
+              data-min="{{ min_price_rupees }}"
+              data-max="{{ max_price_rupees }}"
+            />
+            <div class="flex justify-between mt-3 text-sm font-semibold">
+              <span id="price-min-display">₹{{ min_price_rupees | round }}</span>
+              <span id="price-max-display">₹{{ max_price_rupees | round }}+</span>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% if section.settings.show_brand_filter %}
+        <div>
+          <h3
+            class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4"
+          >
+            Brand
+          </h3>
+          <div class="space-y-3" id="brand-filters">
+            {% for vendor in vendors %}
+              {% liquid
+                assign vendor_count = 0
+                for product in collection.products
+                  if product.vendor == vendor
+                    assign vendor_count = vendor_count | plus: 1
+                  endif
+                endfor
+              %}
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input
+                  class="brand-filter w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20 transition-all"
+                  type="checkbox"
+                  value="{{ vendor | escape }}"
+                  data-vendor="{{ vendor | escape }}"
+                />
+                <span
+                  class="text-sm font-medium group-hover:text-primary transition-colors"
+                  >{{ vendor }} <span class="text-slate-400 ml-1">({{ vendor_count }})</span></span
+                >
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        {% if section.settings.show_rating_filter and has_ratings %}
+        <div>
+          <h3
+            class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4"
+          >
+            Rating
+          </h3>
+          <div class="space-y-3" id="rating-filters">
+            {% for i in (4..5) reversed %}
+              {% liquid
+                assign rating_threshold = i
+                assign rating_count = 0
+                for product in collection.products
+                  assign product_rating = product.metafields.reviews.rating.value | default: 0
+                  if product_rating >= rating_threshold
+                    assign rating_count = rating_count | plus: 1
+                  endif
+                endfor
+              %}
+              {% if rating_count > 0 %}
+              <button
+                class="rating-filter flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+                data-rating="{{ rating_threshold }}"
+              >
+                <div class="flex text-yellow-400">
+                  {% for j in (1..5) %}
+                    {% if j <= rating_threshold %}
+                      <span class="material-symbols-outlined text-lg fill-1">star</span>
+                    {% else %}
+                      <span class="material-symbols-outlined text-lg">star</span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <span>&amp; Up <span class="text-slate-400">({{ rating_count }})</span></span>
+              </button>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        {% if section.settings.show_availability_filter %}
+        <div>
+          <h3
+            class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4"
+          >
+            Availability
+          </h3>
+          <label class="flex items-center gap-3 cursor-pointer group">
+            <input
+              id="availability-filter"
+              class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20 transition-all"
+              type="checkbox"
+              data-availability="in-stock"
+            />
+            <span
+              class="text-sm font-medium group-hover:text-primary transition-colors"
+              >In Stock Only</span
+            >
+          </label>
+        </div>
+        {% endif %}
+        <div class="pt-6 border-t border-slate-200 dark:border-slate-800">
+          <button
+            id="clear-filters-btn"
+            class="w-full py-2.5 px-4 bg-primary/5 hover:bg-primary/10 text-primary font-bold rounded-xl transition-all text-sm"
+          >
+            Clear All Filters
+          </button>
+        </div>
+      </aside>
+      {% endif %}
+      <!-- Main Product Area -->
+      <div class="flex-1">
+        <!-- Grid Header -->
+        <div
+          class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8"
+        >
+          <div>
+            <h1 class="text-3xl font-black text-primary dark:text-white mb-2">
+              {{ collection.title }}
+            </h1>
+            <p class="text-slate-500 font-medium" id="results-count">
+              {% paginate collection.products by products_per_page %}
+                Showing {{ paginate.current_offset | plus: 1 }}-{% if paginate.next %}{{ paginate.current_offset | plus: paginate.page_size }}{% else %}{{ collection.products_count }}{% endif %} of {{ collection.products_count }} results
+              {% endpaginate %}
+            </p>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-sm font-bold text-slate-400 whitespace-nowrap"
+              >SORT BY</span
+            >
+            <div class="relative">
+              <select
+                id="sort-select"
+                class="appearance-none bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 pr-10 text-sm font-bold focus:ring-primary/20 focus:border-primary outline-none cursor-pointer min-w-[180px]"
+              >
+                <option value="manual" {% if section.settings.default_sort == 'manual' %}selected{% endif %}>Featured</option>
+                <option value="best-selling" {% if section.settings.default_sort == 'best-selling' %}selected{% endif %}>Best Selling</option>
+                <option value="title-ascending" {% if section.settings.default_sort == 'title-ascending' %}selected{% endif %}>Alphabetically, A-Z</option>
+                <option value="title-descending" {% if section.settings.default_sort == 'title-descending' %}selected{% endif %}>Alphabetically, Z-A</option>
+                <option value="price-ascending" {% if section.settings.default_sort == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price-descending" {% if section.settings.default_sort == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
+                <option value="created-ascending" {% if section.settings.default_sort == 'created-ascending' %}selected{% endif %}>Date, Old to New</option>
+                <option value="created-descending" {% if section.settings.default_sort == 'created-descending' %}selected{% endif %}>Date, New to Old</option>
+              </select>
+              <span
+                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
+                >expand_more</span
+              >
+            </div>
+          </div>
+        </div>
+        <!-- Product Grid -->
+        <div
+          id="product-grid"
+          class="grid {% if section.settings.mobile_columns == '1' %}grid-cols-1{% else %}grid-cols-2{% endif %} md:grid-cols-2 {% if section.settings.desktop_columns == 2 %}lg:grid-cols-2{% elsif section.settings.desktop_columns == 3 %}lg:grid-cols-3{% elsif section.settings.desktop_columns == 4 %}lg:grid-cols-4{% else %}lg:grid-cols-3{% endif %} gap-6"
+          data-products-per-page="{{ products_per_page }}"
+        >
+          {% paginate collection.products by products_per_page %}
+            {% for product in collection.products %}
+              <div 
+                class="product-item"
+                data-product-id="{{ product.id }}"
+                data-vendor="{{ product.vendor | escape }}"
+                data-price="{{ product.price_min }}"
+                data-available="{{ product.available }}"
+                data-rating="{{ product.metafields.reviews.rating.value | default: 0 }}"
+                data-created="{{ product.created_at | date: '%s' }}"
+              >
+                {% render 'custom-product-card', product: product %}
+              </div>
+            {% endfor %}
+          {% endpaginate %}
+        </div>
+        <!-- Pagination -->
+        {% paginate collection.products by products_per_page %}
+          {% if paginate.pages > 1 %}
+          <div class="mt-12 flex justify-center items-center gap-2" id="pagination">
+            {% if paginate.previous %}
+              <a
+                href="{{ paginate.previous.url }}"
+                class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-primary hover:text-white hover:border-primary transition-all"
+              >
+                <span class="material-symbols-outlined">chevron_left</span>
+              </a>
+            {% else %}
+              <button
+                disabled
+                class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 opacity-50 cursor-not-allowed"
+              >
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+            {% endif %}
+            
+            {% for part in paginate.parts %}
+              {% if part.is_link %}
+                <a
+                  href="{{ part.url }}"
+                  class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 font-bold hover:bg-primary/5 transition-all"
+                >
+                  {{ part.title }}
+                </a>
+              {% else %}
+                {% if part.title == paginate.current_page %}
+                  <button
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-primary text-white font-bold"
+                  >
+                    {{ part.title }}
+                  </button>
+                {% else %}
+                  <span class="px-2 text-slate-400 font-bold">{{ part.title }}</span>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            
+            {% if paginate.next %}
+              <a
+                href="{{ paginate.next.url }}"
+                class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-primary hover:text-white hover:border-primary transition-all"
+              >
+                <span class="material-symbols-outlined">chevron_right</span>
+              </a>
+            {% else %}
+              <button
+                disabled
+                class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 opacity-50 cursor-not-allowed"
+              >
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            {% endif %}
+          </div>
+          {% endif %}
+        {% endpaginate %}
+      </div>
+    </div>
+  </main>
+
+  <script src="{{ 'collection-filters.js' | asset_url }}" defer></script>
+
+  {% style %}
+    .rating-filter.active {
+      color: var(--color-primary, #3b82f6);
+    }
+    .rating-filter.active span {
+      color: var(--color-primary, #3b82f6);
+    }
+  {% endstyle %}
+
+{% schema %}
+{
+  "name": "Collection Page",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "label": "Show Breadcrumbs",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show Filters Sidebar",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per Page",
+      "min": 12,
+      "max": 48,
+      "step": 6,
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "label": "Desktop Columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Mobile Columns",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "header",
+      "content": "Filter Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price_filter",
+      "label": "Show Price Filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brand_filter",
+      "label": "Show Brand Filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating_filter",
+      "label": "Show Rating Filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_availability_filter",
+      "label": "Show Availability Filter",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Sort Settings"
+    },
+    {
+      "type": "select",
+      "id": "default_sort",
+      "label": "Default Sort Option",
+      "options": [
+        {
+          "value": "manual",
+          "label": "Featured"
+        },
+        {
+          "value": "best-selling",
+          "label": "Best Selling"
+        },
+        {
+          "value": "title-ascending",
+          "label": "Alphabetically, A-Z"
+        },
+        {
+          "value": "title-descending",
+          "label": "Alphabetically, Z-A"
+        },
+        {
+          "value": "price-ascending",
+          "label": "Price: Low to High"
+        },
+        {
+          "value": "price-descending",
+          "label": "Price: High to Low"
+        },
+        {
+          "value": "created-ascending",
+          "label": "Date, Old to New"
+        },
+        {
+          "value": "created-descending",
+          "label": "Date, New to Old"
+        }
+      ],
+      "default": "manual"
+    },
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Page"
+    }
+  ]
+}
+{% endschema %}
+
