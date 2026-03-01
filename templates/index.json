@@ -393,6 +393,13 @@
         "share_button_text": "Share Yours",
         "share_button_url": ""
       }
+    },
+    "product_section_hW4HEY": {
+      "type": "product-section",
+      "name": "Product Section",
+      "settings": {
+        "product": "keyboard-11"
+      }
     }
   },
   "order": [
@@ -403,6 +410,7 @@
     "products_list_epTJ7e",
     "trust_badges_ep3iYt",
     "community_reviews_yK4GhK",
-    "instagram_reviews_cqa4d6"
+    "instagram_reviews_cqa4d6",
+    "product_section_hW4HEY"
   ]
 }

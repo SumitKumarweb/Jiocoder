@@ -90,7 +90,8 @@
       "type": "custom-header",
       "name": "Custom Header",
       "settings": {
-        "title": ""
+        "title": "JioCoder",
+        "logo": "shopify://shop_images/1bfdcc28-3166-4f6a-a3cd-beaebc60be80-removebg-preview.png"
       }
     }
   },
