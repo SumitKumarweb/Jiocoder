@@ -1,0 +1,274 @@
+{%- style -%}
+  .custom-carousel-{{ section.id }} {
+    height: {{ section.settings.height }}px;
+  }
+  @media (max-width: 768px) {
+    .custom-carousel-{{ section.id }} {
+      height: {{ section.settings.height_mobile }}px;
+    }
+  }
+{%- endstyle -%}
+
+<!-- Swiper CSS -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+>
+
+<section class="custom-carousel-{{ section.id }} relative rounded-xl overflow-hidden bg-primary mt-10">
+  <div class="swiper custom-carousel-swiper-{{ section.id }} h-full">
+    <div class="swiper-wrapper">
+      {%- for block in section.blocks -%}
+        <div class="swiper-slide" {{ block.shopify_attributes }}>
+          <div class="relative h-full flex items-center group">
+            {%- if block.settings.image != blank -%}
+              <div class="absolute inset-0 z-0">
+                <img
+                  alt="{{ block.settings.heading | default: 'Carousel slide' }}"
+                  class="w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
+                  src="{{ block.settings.image | image_url: width: 1920 }}"
+                  width="{{ block.settings.image.width }}"
+                  height="{{ block.settings.image.height }}"
+                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                >
+              </div>
+            {%- endif -%}
+            <div
+              class="relative z-10 px-12 lg:px-24 max-w-2xl text-white space-y-6"
+            >
+              {%- if block.settings.tag != blank -%}
+                <span
+                  class="inline-block px-3 py-1 bg-accent-green/20 text-accent-green rounded text-xs font-bold uppercase tracking-wider"
+                >
+                  {{ block.settings.tag }}
+                </span>
+              {%- endif -%}
+              {%- if block.settings.heading != blank -%}
+                <h2 class="text-4xl md:text-6xl font-bold leading-tight">
+                  {{ block.settings.heading }}
+                </h2>
+              {%- endif -%}
+              {%- if block.settings.sub_heading != blank -%}
+                <p class="text-lg text-slate-300">
+                  {{ block.settings.sub_heading }}
+                </p>
+              {%- endif -%}
+              {%- if block.settings.button_text != blank and block.settings.button_url != blank -%}
+                <a
+                  href="{{ block.settings.button_url }}"
+                  class="inline-block bg-white text-primary px-8 py-3 rounded-lg font-bold hover:bg-slate-100 transition-all flex items-center gap-2 w-fit"
+                >
+                  {{ block.settings.button_text }}
+                  <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+    <!-- Pagination -->
+    <div class="swiper-pagination custom-carousel-pagination-{{ section.id }}"></div>
+    {%- if section.settings.show_navigation -%}
+      <!-- Navigation buttons -->
+      <div class="swiper-button-next custom-carousel-next-{{ section.id }}"></div>
+      <div class="swiper-button-prev custom-carousel-prev-{{ section.id }}"></div>
+    {%- endif -%}
+  </div>
+</section>
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+<script>
+  (function() {
+    function initSwiper{{ section.id | replace: '-', '_' }}() {
+      if (typeof Swiper === 'undefined') {
+        setTimeout(initSwiper{{ section.id | replace: '-', '_' }}, 50);
+        return;
+      }
+      const swiper{{ section.id | replace: '-', '_' }} = new Swiper('.custom-carousel-swiper-{{ section.id }}', {
+        slidesPerView: 1,
+        spaceBetween: 0,
+        loop: {{ section.settings.loop | json }},
+        autoplay: {{ section.settings.autoplay | json }} ? {
+          delay: 5000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true
+        } : false,
+        speed: {{ section.settings.transition_speed }},
+        effect: '{{ section.settings.effect }}',
+        pagination: {
+          el: '.custom-carousel-pagination-{{ section.id }}',
+          clickable: true,
+          dynamicBullets: true
+        },
+        {%- if section.settings.show_navigation -%}
+        navigation: {
+          nextEl: '.custom-carousel-next-{{ section.id }}',
+          prevEl: '.custom-carousel-prev-{{ section.id }}',
+        },
+        {%- endif -%}
+        keyboard: {
+          enabled: true,
+        },
+        {%- if section.settings.effect == 'fade' -%}
+        fadeEffect: {
+          crossFade: true
+        },
+        {%- endif -%}
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSwiper{{ section.id | replace: '-', '_' }});
+    } else {
+      initSwiper{{ section.id | replace: '-', '_' }}();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Custom Carousel",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Carousel Settings"
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Carousel Height (Desktop)",
+      "min": 300,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "default": 480
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Carousel Height (Mobile)",
+      "min": 300,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "select",
+      "id": "effect",
+      "label": "Transition Effect",
+      "options": [
+        {
+          "value": "slide",
+          "label": "Slide"
+        },
+        {
+          "value": "fade",
+          "label": "Fade"
+        }
+      ],
+      "default": "slide"
+    },
+    {
+      "type": "range",
+      "id": "transition_speed",
+      "label": "Transition Speed",
+      "min": 300,
+      "max": 1500,
+      "step": 100,
+      "unit": "ms",
+      "default": 700
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop Slides",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": true
+    },
+   
+    {
+      "type": "checkbox",
+      "id": "show_navigation",
+      "label": "Show Navigation Arrows",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background Image"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag Text",
+          "default": "New Arrival",
+          "info": "Small badge/tag text displayed above heading"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Precision at your fingertips"
+        },
+        {
+          "type": "textarea",
+          "id": "sub_heading",
+          "label": "Sub Heading",
+          "default": "Engineered for enthusiasts. Explore our curated collection of artisanal mechanical keyboards and bespoke switches."
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "button_url",
+          "label": "Button URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Carousel",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "tag": "New Arrival",
+            "heading": "Precision at your fingertips",
+            "sub_heading": "Engineered for enthusiasts. Explore our curated collection of artisanal mechanical keyboards and bespoke switches.",
+            "button_text": "Shop Now"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "tag": "Featured",
+            "heading": "Discover Excellence",
+            "sub_heading": "Experience the perfect blend of style and functionality with our premium collection.",
+            "button_text": "Explore"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

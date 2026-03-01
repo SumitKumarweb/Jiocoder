@@ -1,0 +1,268 @@
+<section class="space-y-8">
+  {%- if section.settings.heading != blank or section.settings.description != blank or section.settings.share_button_text != blank -%}
+    <div class="flex items-end justify-between">
+      {%- if section.settings.heading != blank or section.settings.description != blank -%}
+        <div class="space-y-2">
+          {%- if section.settings.heading != blank -%}
+            <h3 class="text-2xl font-bold tracking-tight">
+              {{ section.settings.heading }}
+            </h3>
+          {%- endif -%}
+          {%- if section.settings.description != blank -%}
+            <p class="text-slate-400">
+              {{ section.settings.description }}
+            </p>
+          {%- endif -%}
+        </div>
+      {%- else -%}
+        <div></div>
+      {%- endif -%}
+      {%- if section.settings.share_button_text != blank -%}
+        {%- if section.settings.share_button_url != blank -%}
+          <a
+            href="{{ section.settings.share_button_url }}"
+            class="text-brand-green font-bold text-sm flex items-center gap-1 hover:underline"
+          >
+            {{ section.settings.share_button_text }}
+            <span class="material-symbols-outlined text-sm">upload</span>
+          </a>
+        {%- else -%}
+          <button
+            class="text-brand-green font-bold text-sm flex items-center gap-1 hover:underline"
+          >
+            {{ section.settings.share_button_text }}
+            <span class="material-symbols-outlined text-sm">upload</span>
+          </button>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'gallery_item' -%}
+        {%- if block.settings.url != blank -%}
+          <a
+            href="{{ block.settings.url }}"
+            class="gallery-item relative aspect-[9/16] rounded-2xl overflow-hidden cursor-pointer bg-slate-800 border border-white/5 block"
+            {{ block.shopify_attributes }}
+          >
+        {%- else -%}
+          <div
+            class="gallery-item relative aspect-[9/16] rounded-2xl overflow-hidden cursor-pointer bg-slate-800 border border-white/5"
+            {{ block.shopify_attributes }}
+          >
+        {%- endif -%}
+          {%- if block.settings.video != blank -%}
+            <div class="gallery-video-wrapper w-full h-full relative">
+              {{ block.settings.video | video_tag: 
+                image_size: '400x711',
+                autoplay: false,
+                loop: true,
+                controls: false,
+                muted: true,
+                class: 'gallery-video hidden absolute inset-0 w-full h-full object-cover'
+              }}
+              {%- if block.settings.thumbnail != blank -%}
+                <img
+                  alt="{{ block.settings.username | default: 'Gallery item' }}"
+                  class="gallery-thumbnail w-full h-full object-cover"
+                  src="{{ block.settings.thumbnail | image_url: width: 400 }}"
+                  width="{{ block.settings.thumbnail.width }}"
+                  height="{{ block.settings.thumbnail.height }}"
+                  loading="lazy"
+                >
+              {%- elsif block.settings.video.preview_image != blank -%}
+                <img
+                  alt="{{ block.settings.username | default: 'Gallery item' }}"
+                  class="gallery-thumbnail w-full h-full object-cover"
+                  src="{{ block.settings.video.preview_image | image_url: width: 400 }}"
+                  width="{{ block.settings.video.preview_image.width }}"
+                  height="{{ block.settings.video.preview_image.height }}"
+                  loading="lazy"
+                >
+              {%- endif -%}
+            </div>
+          {%- elsif block.settings.thumbnail != blank -%}
+            <img
+              alt="{{ block.settings.username | default: 'Gallery item' }}"
+              class="w-full h-full object-cover"
+              src="{{ block.settings.thumbnail | image_url: width: 400 }}"
+              width="{{ block.settings.thumbnail.width }}"
+              height="{{ block.settings.thumbnail.height }}"
+              loading="lazy"
+            >
+          {%- else -%}
+            <div class="w-full h-full bg-slate-700 flex items-center justify-center">
+              <span class="text-slate-400 text-sm">No media</span>
+            </div>
+          {%- endif -%}
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent p-4 flex flex-col justify-end">
+            {%- if block.settings.username != blank -%}
+              <span class="text-xs font-bold text-white mb-1">{{ block.settings.username }}</span>
+            {%- endif -%}
+            {%- if block.settings.views_count != blank -%}
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-green text-sm fill-1">favorite</span>
+                <span class="text-[10px] text-slate-300">{{ block.settings.views_count }} views</span>
+              </div>
+            {%- endif -%}
+          </div>
+          {%- if block.settings.video != blank -%}
+            <div class="absolute top-3 right-3 p-1.5 bg-black/40 backdrop-blur rounded-full gallery-play-icon">
+              <span class="material-symbols-outlined text-white text-xs">play_arrow</span>
+            </div>
+          {%- endif -%}
+        {%- if block.settings.url != blank -%}
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    
+    galleryItems.forEach(item => {
+      const video = item.querySelector('.gallery-video');
+      const thumbnail = item.querySelector('.gallery-thumbnail');
+      const playIcon = item.querySelector('.gallery-play-icon');
+      
+      if (!video) return;
+      
+      // Play video on hover
+      item.addEventListener('mouseenter', function() {
+        if (video && video.readyState >= 2) {
+          video.classList.remove('hidden');
+          video.play().catch(function(error) {
+            console.log('Video play failed:', error);
+          });
+          if (thumbnail) {
+            thumbnail.style.opacity = '0';
+          }
+          if (playIcon) {
+            playIcon.style.opacity = '0';
+          }
+        }
+      });
+      
+      // Pause video when mouse leaves
+      item.addEventListener('mouseleave', function() {
+        if (video) {
+          video.pause();
+          video.currentTime = 0;
+          video.classList.add('hidden');
+          if (thumbnail) {
+            thumbnail.style.opacity = '1';
+          }
+          if (playIcon) {
+            playIcon.style.opacity = '1';
+          }
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Instagram Reviews",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Live Setup Gallery"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Hover to see these battle-stations in action."
+    },
+    {
+      "type": "text",
+      "id": "share_button_text",
+      "label": "Share Button Text",
+      "default": "Share Yours"
+    },
+    {
+      "type": "url",
+      "id": "share_button_url",
+      "label": "Share Button URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "gallery_item",
+      "name": "Gallery Item",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "image_picker",
+          "id": "thumbnail",
+          "label": "Thumbnail Image",
+          "info": "Optional thumbnail image. If not provided, video preview will be used."
+        },
+        {
+          "type": "text",
+          "id": "username",
+          "label": "Username",
+          "default": "@username",
+          "info": "Instagram username or handle (e.g., @codex_pro)"
+        },
+        {
+          "type": "text",
+          "id": "views_count",
+          "label": "Views Count",
+          "default": "2.4k views",
+          "info": "Number of views (e.g., 2.4k views, 1.8k views)"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL",
+          "info": "Optional link when item is clicked"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Instagram Reviews",
+      "blocks": [
+        {
+          "type": "gallery_item",
+          "settings": {
+            "username": "@codex_pro",
+            "views_count": "2.4k views"
+          }
+        },
+        {
+          "type": "gallery_item",
+          "settings": {
+            "username": "@dev_vibes",
+            "views_count": "1.8k views"
+          }
+        },
+        {
+          "type": "gallery_item",
+          "settings": {
+            "username": "@minimal_java",
+            "views_count": "4.1k views"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

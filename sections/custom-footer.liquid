@@ -1,0 +1,398 @@
+<footer class="bg-primary text-slate-400 pt-16 pb-8 mt-10">
+  <div class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+    <div class="space-y-6">
+      {%- if section.settings.logo != blank or section.settings.brand_name != blank -%}
+          {%- if section.settings.logo != blank -%}
+            <img
+              src="{{ section.settings.logo | image_url: width: 40 }}"
+              alt="{{ section.settings.brand_name | default: shop.name }}"
+              width="{{ section.settings.logo.width }}"
+              height="{{ section.settings.logo.height }}"
+              class="h-10 w-auto"
+            >
+          {%- elsif section.settings.show_icon -%}
+            <span class="material-symbols-outlined text-3xl">{{ section.settings.icon_name | default: 'keyboard' }}</span>
+          {%- endif -%}
+          {%- if section.settings.brand_name != blank -%}
+            <h2 class="text-xl font-bold tracking-tight">{{ section.settings.brand_name }}</h2>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.description != blank -%}
+        <p class="text-sm leading-relaxed">
+          {{ section.settings.description }}
+        </p>
+      {%- endif -%}
+      {%- if section.settings.show_social_media -%}
+        <div class="flex gap-4">
+          {%- if section.settings.facebook_url != blank -%}
+            <a
+              href="{{ section.settings.facebook_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-white transition-colors"
+              aria-label="Facebook"
+            >
+              <span class="material-symbols-outlined">facebook</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.instagram_url != blank -%}
+            <a
+              href="{{ section.settings.instagram_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-white transition-colors"
+              aria-label="Instagram"
+            >
+              <span class="material-symbols-outlined">photo_camera</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.twitter_url != blank -%}
+            <a
+              href="{{ section.settings.twitter_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-white transition-colors"
+              aria-label="Twitter"
+            >
+              <span class="material-symbols-outlined">share</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.youtube_url != blank -%}
+            <a
+              href="{{ section.settings.youtube_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-white transition-colors"
+              aria-label="YouTube"
+            >
+              <span class="material-symbols-outlined">play_circle</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.linkedin_url != blank -%}
+            <a
+              href="{{ section.settings.linkedin_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-white transition-colors"
+              aria-label="LinkedIn"
+            >
+              <span class="material-symbols-outlined">work</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.pinterest_url != blank -%}
+            <a
+              href="{{ section.settings.pinterest_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-white transition-colors"
+              aria-label="Pinterest"
+            >
+              <span class="material-symbols-outlined">bookmark</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.tiktok_url != blank -%}
+            <a
+              href="{{ section.settings.tiktok_url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-white transition-colors"
+              aria-label="TikTok"
+            >
+              <span class="material-symbols-outlined">music_note</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.email_url != blank -%}
+            <a
+              href="mailto:{{ section.settings.email_url }}"
+              class="hover:text-white transition-colors"
+              aria-label="Email"
+            >
+              <span class="material-symbols-outlined">mail</span>
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+    
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'link_list' and block.settings.menu != blank -%}
+        <div class="space-y-4" {{ block.shopify_attributes }}>
+          {%- if block.settings.heading != blank -%}
+            <h6 class="text-white font-bold">{{ block.settings.heading }}</h6>
+          {%- endif -%}
+          <ul class="space-y-2 text-sm">
+            {%- for link in block.settings.menu.links -%}
+              <li>
+                <a
+                  href="{{ link.url }}"
+                  class="hover:text-white transition-colors"
+                >
+                  {{ link.title }}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+    
+    {%- if section.settings.show_newsletter -%}
+      <div class="space-y-4">
+        {%- if section.settings.newsletter_heading != blank -%}
+          <h6 class="text-white font-bold">{{ section.settings.newsletter_heading }}</h6>
+        {%- endif -%}
+        {%- if section.settings.newsletter_description != blank -%}
+          <p class="text-sm">{{ section.settings.newsletter_description }}</p>
+        {%- endif -%}
+        {%- form 'customer', class: 'flex gap-2' -%}
+          <input
+            type="hidden"
+            name="contact[tags]"
+            value="newsletter"
+          >
+          <input
+            class="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-accent-green text-white placeholder:text-slate-400"
+            placeholder="{{ section.settings.newsletter_placeholder | default: 'Email address' }}"
+            type="email"
+            name="contact[email]"
+            required
+            aria-label="Email address"
+          >
+          <button
+            type="submit"
+            class="bg-white text-primary px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-100 transition-colors"
+          >
+            {{ section.settings.newsletter_button_text | default: 'Join' }}
+          </button>
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+  </div>
+  
+  <div class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
+    {%- if section.settings.copyright_text != blank -%}
+      <p class="text-xs">{{ section.settings.copyright_text }}</p>
+    {%- else -%}
+      <p class="text-xs">© {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
+    {%- endif -%}
+    {%- if section.settings.show_payment_icons and section.blocks.size > 0 -%}
+      <div class="flex items-center gap-6 opacity-60 grayscale hover:grayscale-0 transition-all">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'payment_icon' and block.settings.icon != blank -%}
+            <img
+              alt="{{ block.settings.alt_text | default: 'Payment method' }}"
+              class="h-6"
+              src="{{ block.settings.icon | image_url: width: 60 }}"
+              width="{{ block.settings.icon.width }}"
+              height="{{ block.settings.icon.height }}"
+              loading="lazy"
+              {{ block.shopify_attributes }}
+            >
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Custom Footer",
+  "tag": "footer",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "Show Icon",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "icon_name",
+      "label": "Icon Name",
+      "default": "keyboard",
+      "info": "Material icon name (e.g., keyboard, store, etc.)"
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand Name",
+      "default": "ElectroCart"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "The ultimate destination for mechanical keyboard enthusiasts in India. We bring global craftsmanship to your desktop."
+    },
+    {
+      "type": "header",
+      "content": "Social Media"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_media",
+      "label": "Show Social Media Links",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "twitter_url",
+      "label": "Twitter/X URL"
+    },
+    {
+      "type": "url",
+      "id": "youtube_url",
+      "label": "YouTube URL"
+    },
+    {
+      "type": "url",
+      "id": "linkedin_url",
+      "label": "LinkedIn URL"
+    },
+    {
+      "type": "url",
+      "id": "pinterest_url",
+      "label": "Pinterest URL"
+    },
+    {
+      "type": "url",
+      "id": "tiktok_url",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "text",
+      "id": "email_url",
+      "label": "Email Address",
+      "info": "Email address for contact"
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show Newsletter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Newsletter Heading",
+      "default": "Newsletter"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_description",
+      "label": "Newsletter Description",
+      "default": "Subscribe to get early access to group buys and new drops."
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Email Placeholder",
+      "default": "Email address"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_button_text",
+      "label": "Button Text",
+      "default": "Join"
+    },
+    {
+      "type": "header",
+      "content": "Footer Bottom"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright Text",
+      "default": "© 2024 ElectroCart India. All rights reserved.",
+      "info": "Leave blank to use default: © [Year] [Shop Name]. All rights reserved."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show Payment Icons",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link_list",
+      "name": "Link List",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Quick Links"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "payment_icon",
+      "name": "Payment Icon",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt Text",
+          "default": "Payment method"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Footer",
+      "blocks": [
+        {
+          "type": "link_list",
+          "settings": {
+            "heading": "Quick Links"
+          }
+        },
+        {
+          "type": "link_list",
+          "settings": {
+            "heading": "Policies"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

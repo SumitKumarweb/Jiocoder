@@ -1,0 +1,638 @@
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+  rel="stylesheet"
+>
+<link
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+  rel="stylesheet"
+>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          primary: '#0F172A',
+          'background-light': '#F8FAFC',
+          'background-dark': '#0F172A',
+          'accent-green': '#22C55E',
+        },
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Inter', 'sans-serif'],
+        },
+        borderRadius: {
+          DEFAULT: '0.5rem',
+          lg: '1rem',
+          xl: '1.5rem',
+          full: '9999px',
+        },
+      },
+    },
+  };
+</script>
+<style type="text/tailwindcss">
+  @layer base {
+    body {
+      @apply font-sans;
+    }
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .fill-1 {
+    font-variation-settings: 'FILL' 1;
+  }
+  .mega-menu-trigger:hover .mega-menu {
+    display: block;
+  }
+  .search-container:focus-within .search-overlay {
+    display: block;
+  }
+  .search-container:focus-within ~ .page-dimmer {
+    display: block;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<body class="bg-background-light text-slate-900 font-display">
+  <header class="sticky top-0 z-50 shadow-md">
+    <nav class="bg-primary text-white border-b border-white/10 relative">
+      <div
+        class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-20 h-20 flex items-center justify-between gap-8"
+      >
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="bg-accent-green p-1.5 rounded-lg">
+            <span
+              class="material-symbols-outlined text-primary text-2xl font-bold"
+              >keyboard</span
+            >
+          </div>
+          <h1 class="text-2xl font-extrabold tracking-tight">ElectroCart</h1>
+        </div>
+        <div
+          class="flex-1 max-w-3xl md:flex items-center relative z-[60] search-container"
+        >
+          <div
+            class="flex w-full bg-white rounded-lg overflow-hidden border-2 border-transparent focus-within:border-accent-green transition-all"
+          >
+            <select
+              class="bg-slate-100 text-slate-700 text-sm font-medium border-none focus:ring-0 px-4 py-2.5 cursor-pointer hover:bg-slate-200 transition-colors"
+            >
+              <option>All Categories</option>
+              <option>Keyboards</option>
+              <option>Mouse Pads</option>
+              <option>USB Cables</option>
+              <option>Mice</option>
+            </select>
+            <div class="w-px h-6 bg-slate-300 self-center"></div>
+            <div class="relative flex-1">
+              <input
+                class="w-full border-none focus:ring-0 py-2.5 pl-4 pr-12 text-sm text-slate-900 placeholder-slate-400"
+                placeholder="Search for 'Keyboards'..."
+                type="text"
+              >
+              <button
+                class="absolute right-0 top-0 h-full px-4 text-slate-500 hover:text-primary transition-colors"
+              >
+                <span class="material-symbols-outlined">search</span>
+              </button>
+            </div>
+          </div>
+          <div
+            class="search-overlay hidden absolute top-full left-0 w-full mt-2 bg-white text-slate-900 shadow-2xl rounded-xl border border-slate-100 overflow-hidden"
+          >
+            <div class="grid grid-cols-12">
+              <div class="col-span-8 p-6 space-y-8">
+                <div class="space-y-3">
+                  <h4
+                    class="text-[10px] uppercase font-black text-slate-400 tracking-widest flex items-center gap-2"
+                  >
+                    <span class="material-symbols-outlined text-sm">history</span>
+                    Recent Searches
+                  </h4>
+                  <div class="flex flex-wrap gap-2">
+                    <a
+                      class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full text-xs font-medium text-slate-600 transition-colors"
+                      href="#"
+                      >Custom Keycaps</a
+                    >
+                    <a
+                      class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full text-xs font-medium text-slate-600 transition-colors"
+                      href="#"
+                      >Coiled Cable</a
+                    >
+                    <a
+                      class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full text-xs font-medium text-slate-600 transition-colors"
+                      href="#"
+                      >Desk Mat XL</a
+                    >
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <h4
+                    class="text-[10px] uppercase font-black text-slate-400 tracking-widest flex items-center gap-2"
+                  >
+                    <span class="material-symbols-outlined text-sm">category</span>
+                    Popular Categories
+                  </h4>
+                  <div class="grid grid-cols-3 gap-3">
+                    <a
+                      class="flex items-center gap-3 p-2 rounded-lg border border-slate-100 hover:border-accent-green hover:bg-slate-50 transition-all group"
+                      href="#"
+                    >
+                      <div
+                        class="w-8 h-8 bg-slate-100 flex items-center justify-center rounded group-hover:bg-accent-green group-hover:text-white transition-colors"
+                      >
+                        <span class="material-symbols-outlined text-sm">keyboard</span>
+                      </div>
+                      <span class="text-xs font-bold text-slate-700">Mechanical Keyboards</span>
+                    </a>
+                    <a
+                      class="flex items-center gap-3 p-2 rounded-lg border border-slate-100 hover:border-accent-green hover:bg-slate-50 transition-all group"
+                      href="#"
+                    >
+                      <div
+                        class="w-8 h-8 bg-slate-100 flex items-center justify-center rounded group-hover:bg-accent-green group-hover:text-white transition-colors"
+                      >
+                        <span class="material-symbols-outlined text-sm">mouse</span>
+                      </div>
+                      <span class="text-xs font-bold text-slate-700">Gaming Mice</span>
+                    </a>
+                    <a
+                      class="flex items-center gap-3 p-2 rounded-lg border border-slate-100 hover:border-accent-green hover:bg-slate-50 transition-all group"
+                      href="#"
+                    >
+                      <div
+                        class="w-8 h-8 bg-slate-100 flex items-center justify-center rounded group-hover:bg-accent-green group-hover:text-white transition-colors"
+                      >
+                        <span class="material-symbols-outlined text-sm">cable</span>
+                      </div>
+                      <span class="text-xs font-bold text-slate-700">Premium Cables</span>
+                    </a>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <h4
+                    class="text-[10px] uppercase font-black text-slate-400 tracking-widest flex items-center gap-2"
+                  >
+                    <span class="material-symbols-outlined text-sm">search_spark</span>
+                    Matching Products
+                  </h4>
+                  <div class="space-y-3">
+                    <a
+                      class="flex items-center gap-4 p-2 rounded-xl hover:bg-slate-50 transition-colors"
+                      href="#"
+                    >
+                      <img
+                        alt="Product"
+                        class="w-12 h-12 rounded object-cover border border-slate-100"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVA_-B12wrZHmkzZ0JS_w6YqBEeiWUHL-yo3FEwx9c9gXaJTZSRmBDVKQi4WgAoT1pgIxToDSiT6FRcVKmxerqeO-f9IYBLjIf0ZuyfqFNRhxhDS5Kuo3dGmO2L1BWOd88iu9s6hysFVNVyYWJ_qsjVHKMTsKJeYiMca5mmQ-CvDEDa-H62n7_lAGLE0RXrB0xGRSjU24V7KGl_DwmxjY830FIxC9VpaX14WXWTlwTLNARvo7gzXP97WcgP6hiEXeD8KwXmgJVHRyT"
+                      >
+                      <div class="flex-1">
+                        <p class="text-sm font-bold text-slate-900">Keychron K2 V2 Wireless Keyboard</p>
+                        <p class="text-xs text-slate-500">In Keyboards</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-sm font-bold text-primary">₹8,499</p>
+                        <p class="text-[10px] text-accent-green font-bold">In Stock</p>
+                      </div>
+                    </a>
+                    <a
+                      class="flex items-center gap-4 p-2 rounded-xl hover:bg-slate-50 transition-colors"
+                      href="#"
+                    >
+                      <img
+                        alt="Product"
+                        class="w-12 h-12 rounded object-cover border border-slate-100"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKQyC6WFTf8MJOcWjJFwxdZ56gafGjIO355ezHoArGqNVxMvTh7rSuWRStgoQ2e0SCBcXgVU0QW2IYM3qSa4FZMO9-MIfH_KWadR2rwSHDAF9YZen4Z-E3y1tXF3GrXMChtxeB4u_v4nEJHTWnabdNueSJS0SWbBkwWIKtXFz1Iqlu2JGFHU7MJ3YOZ6O9b_lFV_W3fizQDFR7wleMqzOZ8a16yecgjjuiSvZ_4-WpIfo-W-_npJyLCHNUZJRXbJHkW3BfxMHrQOxh"
+                      >
+                      <div class="flex-1">
+                        <p class="text-sm font-bold text-slate-900">Ducky One 3 Daybreak TKL</p>
+                        <p class="text-xs text-slate-500">In Keyboards</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-sm font-bold text-primary">₹12,999</p>
+                        <p class="text-[10px] text-slate-500">Limited Stock</p>
+                      </div>
+                    </a>
+                  </div>
+                  <button
+                    class="w-full py-2 text-xs font-bold text-accent-green border border-accent-green/20 rounded-lg hover:bg-accent-green/5 transition-colors"
+                  >
+                    View all 24 matching items
+                  </button>
+                </div>
+              </div>
+              <div
+                class="col-span-4 bg-slate-50 p-6 border-l border-slate-100"
+              >
+                <h4
+                  class="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-4 flex items-center gap-2"
+                >
+                  <span
+                    class="material-symbols-outlined text-sm text-red-500 fill-1"
+                    >trending_up</span
+                  >
+                  Trending Now
+                </h4>
+                <div class="space-y-4">
+                  <a class="flex items-center gap-3 group" href="#">
+                    <span
+                      class="text-slate-300 font-bold text-lg italic group-hover:text-accent-green"
+                      >01</span
+                    >
+                    <span
+                      class="text-xs font-semibold text-slate-600 group-hover:text-primary underline-offset-4 decoration-accent-green group-hover:underline"
+                      >Hall Effect Switches</span
+                    >
+                  </a>
+                  <a class="flex items-center gap-3 group" href="#">
+                    <span
+                      class="text-slate-300 font-bold text-lg italic group-hover:text-accent-green"
+                      >02</span
+                    >
+                    <span
+                      class="text-xs font-semibold text-slate-600 group-hover:text-primary underline-offset-4 decoration-accent-green group-hover:underline"
+                      >Transparent Keycaps</span
+                    >
+                  </a>
+                  <a class="flex items-center gap-3 group" href="#">
+                    <span
+                      class="text-slate-300 font-bold text-lg italic group-hover:text-accent-green"
+                      >03</span
+                    >
+                    <span
+                      class="text-xs font-semibold text-slate-600 group-hover:text-primary underline-offset-4 decoration-accent-green group-hover:underline"
+                      >QMK/VIA Keyboards</span
+                    >
+                  </a>
+                  <a class="flex items-center gap-3 group" href="#">
+                    <span
+                      class="text-slate-300 font-bold text-lg italic group-hover:text-accent-green"
+                      >04</span
+                    >
+                    <span
+                      class="text-xs font-semibold text-slate-600 group-hover:text-primary underline-offset-4 decoration-accent-green group-hover:underline"
+                      >Artisan Esc Keys</span
+                    >
+                  </a>
+                  <a class="flex items-center gap-3 group" href="#">
+                    <span
+                      class="text-slate-300 font-bold text-lg italic group-hover:text-accent-green"
+                      >05</span
+                    >
+                    <span
+                      class="text-xs font-semibold text-slate-600 group-hover:text-primary underline-offset-4 decoration-accent-green group-hover:underline"
+                      >Lubing Kits</span
+                    >
+                  </a>
+                </div>
+                <div class="mt-8 pt-8 border-t border-slate-200">
+                  <div
+                    class="bg-primary rounded-lg p-4 relative overflow-hidden"
+                  >
+                    <div class="relative z-10">
+                      <p
+                        class="text-[10px] text-accent-green font-black uppercase"
+                      >
+                        Flash Sale
+                      </p>
+                      <h5 class="text-white text-xs font-bold mt-1">Gateron Yellow Switches</h5>
+                      <p class="text-[10px] text-white/60">30% OFF - 24h Left</p>
+                    </div>
+                    <div class="absolute -right-4 -bottom-4 opacity-10">
+                      <span
+                        class="material-symbols-outlined text-6xl text-white"
+                        >bolt</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-8">
+          <div
+            class="xl:flex items-center gap-6 text-sm font-semibold tracking-wide h-20"
+          >
+            <div class="mega-menu-trigger h-full flex items-center">
+              <a
+                class="text-white hover:text-accent-green transition-colors flex items-center gap-1 cursor-default py-8"
+                href="#"
+              >
+                Shop
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+              </a>
+              <div
+                class="mega-menu hidden absolute top-20 left-0 w-full bg-white text-slate-900 shadow-2xl border-t border-slate-100 z-50"
+              >
+                <div
+                  class="max-w-[1440px] mx-auto px-10 lg:px-20 py-10 grid grid-cols-12 gap-10"
+                >
+                  <div class="col-span-3 space-y-6">
+                    <h4
+                      class="text-xs uppercase font-black text-slate-400 tracking-widest"
+                    >
+                      Featured Categories
+                    </h4>
+                    <div class="space-y-4">
+                      <a class="flex items-center gap-4 group" href="#">
+                        <div
+                          class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center group-hover:bg-accent-green group-hover:text-white transition-colors"
+                        >
+                          <span class="material-symbols-outlined">keyboard</span>
+                        </div>
+                        <span
+                          class="font-bold text-slate-700 group-hover:text-primary"
+                          >Keyboards</span
+                        >
+                      </a>
+                      <a class="flex items-center gap-4 group" href="#">
+                        <div
+                          class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center group-hover:bg-accent-green group-hover:text-white transition-colors"
+                        >
+                          <span class="material-symbols-outlined">mouse</span>
+                        </div>
+                        <span
+                          class="font-bold text-slate-700 group-hover:text-primary"
+                          >Mice</span
+                        >
+                      </a>
+                      <a class="flex items-center gap-4 group" href="#">
+                        <div
+                          class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center group-hover:bg-accent-green group-hover:text-white transition-colors"
+                        >
+                          <span class="material-symbols-outlined">cable</span>
+                        </div>
+                        <span
+                          class="font-bold text-slate-700 group-hover:text-primary"
+                          >Cables</span
+                        >
+                      </a>
+                      <a class="flex items-center gap-4 group" href="#">
+                        <div
+                          class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center group-hover:bg-accent-green group-hover:text-white transition-colors"
+                        >
+                          <span class="material-symbols-outlined">layers</span>
+                        </div>
+                        <span
+                          class="font-bold text-slate-700 group-hover:text-primary"
+                          >Desk Mats</span
+                        >
+                      </a>
+                    </div>
+                  </div>
+                  <div
+                    class="col-span-3 space-y-6 border-l border-slate-100 pl-10"
+                  >
+                    <h4
+                      class="text-xs uppercase font-black text-slate-400 tracking-widest"
+                    >
+                      Top Brands
+                    </h4>
+                    <div class="grid grid-cols-1 gap-3">
+                      <a
+                        class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors"
+                        href="#"
+                        >Keychron</a
+                      >
+                      <a
+                        class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors"
+                        href="#"
+                        >Logitech G</a
+                      >
+                      <a
+                        class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors"
+                        href="#"
+                        >Glorious</a
+                      >
+                      <a
+                        class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors"
+                        href="#"
+                        >Razer</a
+                      >
+                      <a
+                        class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors"
+                        href="#"
+                        >Ducky</a
+                      >
+                      <a
+                        class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors"
+                        href="#"
+                        >Varmilo</a
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="col-span-3 space-y-6 border-l border-slate-100 pl-10"
+                  >
+                    <h4
+                      class="text-xs uppercase font-black text-slate-400 tracking-widest"
+                    >
+                      New Arrivals
+                    </h4>
+                    <div class="space-y-4">
+                      <div class="flex gap-3">
+                        <img
+                          alt="New keyboard"
+                          class="w-12 h-12 rounded object-cover"
+                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVA_-B12wrZHmkzZ0JS_w6YqBEeiWUHL-yo3FEwx9c9gXaJTZSRmBDVKQi4WgAoT1pgIxToDSiT6FRcVKmxerqeO-f9IYBLjIf0ZuyfqFNRhxhDS5Kuo3dGmO2L1BWOd88iu9s6hysFVNVyYWJ_qsjVHKMTsKJeYiMca5mmQ-CvDEDa-H62n7_lAGLE0RXrB0xGRSjU24V7KGl_DwmxjY830FIxC9VpaX14WXWTlwTLNARvo7gzXP97WcgP6hiEXeD8KwXmgJVHRyT"
+                        >
+                        <div>
+                          <p
+                            class="text-xs font-bold text-primary leading-tight"
+                          >
+                            Artisan Series K2
+                          </p>
+                          <p class="text-[10px] text-slate-500">Starting from ₹9,999</p>
+                        </div>
+                      </div>
+                      <div class="flex gap-3">
+                        <img
+                          alt="New mouse"
+                          class="w-12 h-12 rounded object-cover"
+                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKPTnPR2ZYt_a6VaISccTem49dOMrTwIeqIByZotD0MSDbynXY1x4jRH3kg8-Zh-qrbNn1w0WLg2nfSAzcB8STxJNCIKxO5SUb6EHtAd-_H9SntE78Ey0byBkeSf2PMVLS-ndiYmeQaWRKT5ZdiF4DIJh837aYSuixZD12MhQQN2TxFwEvl014VM1X3bhPHDJmuFIxzRrjbiYKMIu6nIdy13CpeF94iJsBTtzZLSLKI4FKoZrqif0csbfYmFwMxn0qhzkkrBNVyjWB"
+                        >
+                        <div>
+                          <p
+                            class="text-xs font-bold text-primary leading-tight"
+                          >
+                            Pro Wireless X
+                          </p>
+                          <p class="text-[10px] text-slate-500">Starting from ₹7,499</p>
+                        </div>
+                      </div>
+                    </div>
+                    <a
+                      class="inline-block text-xs font-bold text-accent-green hover:underline"
+                      href="#"
+                      >View All New Drops →</a
+                    >
+                  </div>
+                  <div class="col-span-3">
+                    <div
+                      class="bg-slate-900 rounded-xl p-6 relative overflow-hidden h-full flex flex-col justify-end min-h-[220px]"
+                    >
+                      <img
+                        alt="Promo banner"
+                        class="absolute inset-0 w-full h-full object-cover opacity-50"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2szADM5ISIXlgO-jmeh_WgCinJ9UftMKB7j6hbRvTZD5ugGjePtpr6m6DVHlXAPcWT6auCrnysq7_CpQwCJnpNpXlF2CwFWG46ax5ECUikI41JhnjQiN_2MxhxVr4VP_vnIIKjaaWwjTH7fUC2MvhBjuJL2RWLMZXlW9j-wgVELmIfI4q2tkSXebnBWq05UTZ9Rh8jilVaLs2osLyifV7aJuTcEgQyi5mJEZ2CK_sUwrFtxkOuHmN7uvsM8f-3Y_3Dq09Cx5Zgvfo"
+                      >
+                      <div class="relative z-10 space-y-3">
+                        <span
+                          class="inline-block px-2 py-0.5 bg-accent-green text-primary text-[10px] font-black uppercase rounded"
+                          >Product of the Month</span
+                        >
+                        <h5
+                          class="text-white font-bold text-lg leading-tight"
+                        >
+                          Ultimate Coiled Cables
+                        </h5>
+                        <button
+                          class="bg-white text-primary px-4 py-2 rounded text-xs font-bold hover:bg-slate-100 transition-colors"
+                        >
+                          Shop Now
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mega-menu-trigger h-full flex items-center">
+              <a
+                class="text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-default py-8"
+                href="#"
+              >
+                Collections
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+              </a>
+            </div>
+            <a
+              class="text-white/80 hover:text-white transition-colors"
+              href="#"
+              >Blog</a
+            >
+            <a
+              class="text-white/80 hover:text-white transition-colors"
+              href="#"
+              >Deals</a
+            >
+          </div>
+          <div class="flex items-center gap-5">
+            <a class="flex flex-col items-center group" href="#">
+              <span
+                class="material-symbols-outlined group-hover:text-accent-green transition-colors"
+                >favorite</span
+              >
+              <span
+                class="text-[10px] font-bold uppercase mt-0.5 tracking-tighter text-slate-300"
+                >Wishlist</span
+              >
+            </a>
+            <a class="flex flex-col items-center group" href="#">
+              <span
+                class="material-symbols-outlined group-hover:text-accent-green transition-colors"
+                >person</span
+              >
+              <span
+                class="text-[10px] font-bold uppercase mt-0.5 tracking-tighter text-slate-300"
+                >Account</span
+              >
+            </a>
+            <a class="flex flex-col items-center group relative" href="#">
+              <div class="relative">
+                <span
+                  class="material-symbols-outlined group-hover:text-accent-green transition-colors"
+                  >shopping_cart</span
+                >
+                <span
+                  class="absolute -top-2 -right-2 bg-accent-green text-primary text-[10px] font-black h-4 w-4 rounded-full flex items-center justify-center border-2 border-primary"
+                  >2</span
+                >
+              </div>
+              <span
+                class="text-[10px] font-bold uppercase mt-0.5 tracking-tighter text-slate-300"
+                >Cart</span
+              >
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="bg-white border-b border-slate-200 md:block">
+      <div
+        class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-20 h-12 flex items-center"
+      >
+        <div
+          class="flex items-center gap-8 overflow-x-auto no-scrollbar py-2"
+        >
+          <a
+            class="text-xs font-bold text-slate-600 hover:text-primary transition-colors whitespace-nowrap flex items-center gap-1.5"
+            href="#"
+          >
+            <span class="material-symbols-outlined text-lg">grid_view</span>
+            Shop by Category
+          </a>
+          <div class="w-px h-4 bg-slate-300"></div>
+          <a
+            class="text-xs font-semibold text-slate-500 hover:text-primary transition-colors whitespace-nowrap"
+            href="#"
+            >Mouse Pads</a
+          >
+          <a
+            class="text-xs font-semibold text-slate-500 hover:text-primary transition-colors whitespace-nowrap"
+            href="#"
+            >Keyboard Pads</a
+          >
+          <a
+            class="text-xs font-semibold text-slate-500 hover:text-primary transition-colors whitespace-nowrap"
+            href="#"
+            >USB Cables</a
+          >
+          <a
+            class="text-xs font-semibold text-slate-500 hover:text-primary transition-colors whitespace-nowrap"
+            href="#"
+            >Keyboards</a
+          >
+          <a
+            class="text-xs font-semibold text-slate-500 hover:text-primary transition-colors whitespace-nowrap"
+            href="#"
+            >Mouse</a
+          >
+        </div>
+        <div class="ml-auto flex items-center gap-4">
+          <span class="text-xs font-bold text-accent-green animate-pulse">Limited Drop: Artisan Series →</span>
+        </div>
+      </div>
+    </div>
+  </header>
+</body>
+
+{% schema %}
+{
+  "name": "Custom Header",
+  "tag": "header",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Header"
+    }
+  ]
+}
+{% endschema %}

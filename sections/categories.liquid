@@ -1,0 +1,121 @@
+<section class="space-y-6 mt-10">
+  {%- if section.settings.heading != blank or section.settings.view_all_text != blank -%}
+    <div class="flex items-center justify-between">
+      {%- if section.settings.heading != blank -%}
+        <h3 class="text-2xl font-bold tracking-tight">{{ section.settings.heading }}</h3>
+      {%- else -%}
+        <div></div>
+      {%- endif -%}
+      {%- if section.settings.view_all_text != blank -%}
+        {%- if section.settings.view_all_url != blank -%}
+          <a
+            class="text-primary font-semibold text-sm flex items-center gap-1 hover:underline"
+            href="{{ section.settings.view_all_url }}"
+          >
+            {{ section.settings.view_all_text }}
+            <span class="material-symbols-outlined text-sm">chevron_right</span>
+          </a>
+        {%- else -%}
+          <span class="text-primary font-semibold text-sm flex items-center gap-1">
+            {{ section.settings.view_all_text }}
+            <span class="material-symbols-outlined text-sm">chevron_right</span>
+          </span>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+    {%- for block in section.blocks -%}
+      {%- if block.settings.url != blank -%}
+        <a class="group text-center space-y-3" href="{{ block.settings.url }}" {{ block.shopify_attributes }}>
+      {%- else -%}
+        <div class="group text-center space-y-3" {{ block.shopify_attributes }}>
+      {%- endif -%}
+        <div
+          class="aspect-square bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 p-4 transition-all group-hover:shadow-md group-hover:border-primary/20"
+        >
+          {%- if block.settings.image != blank -%}
+            <img
+              alt="{{ block.settings.title | default: 'Category' }}"
+              class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform"
+              src="{{ block.settings.image | image_url: width: 400 }}"
+              width="{{ block.settings.image.width }}"
+              height="{{ block.settings.image.height }}"
+              loading="lazy"
+            >
+          {%- else -%}
+            <div class="w-full h-full flex items-center justify-center">
+              <span class="text-slate-400 text-sm">No image</span>
+            </div>
+          {%- endif -%}
+        </div>
+        {%- if block.settings.title != blank -%}
+          <p class="font-semibold text-sm lg:text-base group-hover:text-primary transition-colors">
+            {{ block.settings.title }}
+          </p>
+        {%- endif -%}
+      {%- if block.settings.url != blank -%}
+        </a>
+      {%- else -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Categories",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Categories"
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View All Text",
+      "default": "View All"
+    },
+    {
+      "type": "url",
+      "id": "view_all_url",
+      "label": "View All URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Category Name"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Categories",
+      
+    }
+  ]
+}
+{% endschema %}

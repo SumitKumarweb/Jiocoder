@@ -1,0 +1,129 @@
+{%- liquid
+  if product == blank
+    if block != blank and block.settings.product != blank
+      assign product = block.settings.product
+    else
+      assign product = all_products.first
+    endif
+  endif
+  
+  assign badge_text = ''
+  if block != blank and block.settings.badge_text != blank
+    assign badge_text = block.settings.badge_text
+  endif
+  
+  if product != blank
+    assign featured_image = product.featured_media.preview_image
+    assign first_variant = product.selected_or_first_available_variant
+    assign compare_at_price = first_variant.compare_at_price
+    assign price = first_variant.price
+    assign available = first_variant.available
+  else
+    assign featured_image = blank
+    assign first_variant = blank
+    assign compare_at_price = 0
+    assign price = 0
+    assign available = false
+  endif
+  
+  assign rating = 4.0
+  assign review_count = 128
+-%}
+
+<div
+  class="bg-white rounded-[16px] overflow-hidden shadow-sm border border-slate-200 flex flex-col transition-all hover:shadow-xl hover:-translate-y-1 group"
+  {% if block != blank %}{{ block.shopify_attributes }}{% endif %}
+>
+  <a href="{% if product != blank %}{{ product.url }}{% else %}#{% endif %}" class="relative aspect-[4/3] bg-slate-50 overflow-hidden block">
+    {%- if featured_image != blank -%}
+      <img
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        alt="{{ product.title | escape }}"
+        src="{{ featured_image | image_url: width: 600 }}"
+        width="{{ featured_image.width }}"
+        height="{{ featured_image.height }}"
+        loading="lazy"
+      >
+    {%- else -%}
+      <div class="w-full h-full flex items-center justify-center bg-slate-100">
+        <span class="text-slate-400">No image</span>
+      </div>
+    {%- endif -%}
+    <button
+      type="button"
+      class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur rounded-full text-slate-900 hover:bg-white transition-colors"
+      aria-label="Add to favorites"
+    >
+      <span class="material-symbols-outlined text-xl">favorite</span>
+    </button>
+  </a>
+  <div class="p-5 flex-1 flex flex-col space-y-3">
+    <div class="flex justify-between items-start">
+      <div>
+        {%- if product.vendor != blank -%}
+          <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">
+            {{ product.vendor }}
+          </p>
+        {%- endif -%}
+        <h4 class="font-semibold text-lg line-clamp-1">
+          <a href="{% if product != blank %}{{ product.url }}{% else %}#{% endif %}" class="hover:text-primary transition-colors">
+            {% if product != blank %}{{ product.title }}{% else %}Product{% endif %}
+          </a>
+        </h4>
+      </div>
+      {%- if badge_text != blank -%}
+        <span class="bg-accent-green text-white text-[10px] font-bold px-2 py-1 rounded whitespace-nowrap">
+          {{ badge_text }}
+        </span>
+      {%- elsif compare_at_price > price -%}
+        {%- assign discount = compare_at_price | minus: price | times: 100.0 | divided_by: compare_at_price | round -%}
+        <span class="bg-accent-green text-white text-[10px] font-bold px-2 py-1 rounded whitespace-nowrap">
+          Save {{ discount }}%
+        </span>
+      {%- endif -%}
+    </div>
+    <div class="flex items-center gap-1 text-yellow-400">
+      {%- assign full_stars = rating | floor -%}
+      {%- for i in (1..5) -%}
+        {%- if i <= full_stars -%}
+          <span class="material-symbols-outlined text-sm fill-1">star</span>
+        {%- else -%}
+          <span class="material-symbols-outlined text-sm">star</span>
+        {%- endif -%}
+      {%- endfor -%}
+      <span class="text-xs text-slate-500 ml-1">({{ review_count }})</span>
+    </div>
+    <div class="mt-auto pt-4 flex items-center justify-between">
+      <div>
+        <span class="text-2xl font-bold text-primary">{{ price | money }}</span>
+        {%- if compare_at_price > price -%}
+          <span class="text-slate-400 line-through text-sm ml-2">
+            {{ compare_at_price | money }}
+          </span>
+        {%- endif -%}
+      </div>
+      {%- if available -%}
+        <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" class="inline">
+          <input type="hidden" name="id" value="{{ first_variant.id }}">
+          <button
+            type="submit"
+            class="bg-primary text-white p-2 rounded-lg hover:bg-slate-800 transition-colors flex items-center justify-center"
+            aria-label="Add {{ product.title }} to cart"
+          >
+            <span class="material-symbols-outlined">add_shopping_cart</span>
+          </button>
+        </form>
+      {%- else -%}
+        <button
+          type="button"
+          disabled
+          class="bg-slate-300 text-white p-2 rounded-lg cursor-not-allowed flex items-center justify-center"
+          aria-label="Product unavailable"
+        >
+          <span class="material-symbols-outlined">remove_shopping_cart</span>
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
