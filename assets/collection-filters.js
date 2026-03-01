@@ -16,6 +16,7 @@ class CollectionFilters {
     
     this.products = [];
     this.filteredProducts = [];
+    this.currentSort = 'manual';
     
     this.init();
   }
@@ -26,6 +27,11 @@ class CollectionFilters {
     // Get all products from the grid
     this.products = Array.from(this.productGrid.querySelectorAll('.product-item'));
     this.filteredProducts = [...this.products];
+    
+    // Get initial sort value from select
+    if (this.sortSelect) {
+      this.currentSort = this.sortSelect.value;
+    }
     
     // Initialize event listeners
     this.setupEventListeners();
@@ -66,6 +72,7 @@ class CollectionFilters {
     // Sort select
     if (this.sortSelect) {
       this.sortSelect.addEventListener('change', (e) => {
+        this.currentSort = e.target.value;
         this.sortProducts(e.target.value);
       });
     }
@@ -142,52 +149,79 @@ class CollectionFilters {
       });
     }
     
-    // Update UI
-    this.updateProductGrid();
-    this.updateResultsCount();
-    this.updateURL();
+    // Apply current sort after filtering
+    if (this.currentSort && this.currentSort !== 'manual') {
+      this.sortProducts(this.currentSort);
+    } else {
+      // Update UI without sorting
+      this.updateProductGrid();
+      this.updateResultsCount();
+      this.updateURL();
+    }
   }
   
   sortProducts(sortValue) {
+    if (!sortValue) {
+      sortValue = this.currentSort || 'manual';
+    }
+    
     const sorted = [...this.filteredProducts];
     
     switch(sortValue) {
       case 'price-ascending':
-        sorted.sort((a, b) => parseFloat(a.dataset.price) - parseFloat(b.dataset.price));
+        sorted.sort((a, b) => {
+          const priceA = parseFloat(a.dataset.price) || 0;
+          const priceB = parseFloat(b.dataset.price) || 0;
+          return priceA - priceB;
+        });
         break;
       case 'price-descending':
-        sorted.sort((a, b) => parseFloat(b.dataset.price) - parseFloat(a.dataset.price));
+        sorted.sort((a, b) => {
+          const priceA = parseFloat(a.dataset.price) || 0;
+          const priceB = parseFloat(b.dataset.price) || 0;
+          return priceB - priceA;
+        });
         break;
       case 'title-ascending':
         sorted.sort((a, b) => {
-          const titleA = a.querySelector('h3 a')?.textContent.trim() || '';
-          const titleB = b.querySelector('h3 a')?.textContent.trim() || '';
-          return titleA.localeCompare(titleB);
+          const titleA = a.querySelector('h3 a')?.textContent.trim() || a.querySelector('h3')?.textContent.trim() || '';
+          const titleB = b.querySelector('h3 a')?.textContent.trim() || b.querySelector('h3')?.textContent.trim() || '';
+          return titleA.localeCompare(titleB, undefined, { sensitivity: 'base' });
         });
         break;
       case 'title-descending':
         sorted.sort((a, b) => {
-          const titleA = a.querySelector('h3 a')?.textContent.trim() || '';
-          const titleB = b.querySelector('h3 a')?.textContent.trim() || '';
-          return titleB.localeCompare(titleA);
+          const titleA = a.querySelector('h3 a')?.textContent.trim() || a.querySelector('h3')?.textContent.trim() || '';
+          const titleB = b.querySelector('h3 a')?.textContent.trim() || b.querySelector('h3')?.textContent.trim() || '';
+          return titleB.localeCompare(titleA, undefined, { sensitivity: 'base' });
         });
         break;
       case 'created-descending':
-        sorted.sort((a, b) => parseFloat(b.dataset.created) - parseFloat(a.dataset.created));
+        sorted.sort((a, b) => {
+          const createdA = parseFloat(a.dataset.created) || 0;
+          const createdB = parseFloat(b.dataset.created) || 0;
+          return createdB - createdA;
+        });
         break;
       case 'created-ascending':
-        sorted.sort((a, b) => parseFloat(a.dataset.created) - parseFloat(b.dataset.created));
+        sorted.sort((a, b) => {
+          const createdA = parseFloat(a.dataset.created) || 0;
+          const createdB = parseFloat(b.dataset.created) || 0;
+          return createdA - createdB;
+        });
         break;
       case 'best-selling':
-        // This would require additional data, for now just keep original order
+        // This would require additional data (sales count), for now keep original order
+        // Could be implemented with a data-sales attribute if available
         break;
       default:
-        // Manual/Featured - keep original order
+        // Manual/Featured - keep original order from Liquid
         break;
     }
     
     this.filteredProducts = sorted;
     this.updateProductGrid();
+    this.updateResultsCount();
     this.updateURL();
   }
   
@@ -267,9 +301,10 @@ class CollectionFilters {
     // Reset sort
     if (this.sortSelect) {
       this.sortSelect.value = 'manual';
+      this.currentSort = 'manual';
     }
     
-    // Apply filters
+    // Apply filters (will reset to original order since sort is manual)
     this.applyFilters();
   }
   
@@ -314,13 +349,14 @@ class CollectionFilters {
     const sort = urlParams.get('sort');
     if (sort && this.sortSelect) {
       this.sortSelect.value = sort;
+      this.currentSort = sort;
+    } else if (this.sortSelect) {
+      // Use the default sort from the select (which comes from Liquid settings)
+      this.currentSort = this.sortSelect.value;
     }
     
-    // Apply all filters
+    // Apply all filters (this will also apply sort if currentSort is set)
     this.applyFilters();
-    if (sort) {
-      this.sortProducts(sort);
-    }
   }
   
   updateURL() {

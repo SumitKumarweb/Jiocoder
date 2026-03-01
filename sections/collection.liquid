@@ -228,7 +228,6 @@
         <!-- Product Grid -->
         <div
           id="product-grid"
-          class="grid {% if section.settings.mobile_columns == '1' %}grid-cols-1{% else %}grid-cols-2{% endif %} md:grid-cols-2 {% if section.settings.desktop_columns == 2 %}lg:grid-cols-2{% elsif section.settings.desktop_columns == 3 %}lg:grid-cols-3{% elsif section.settings.desktop_columns == 4 %}lg:grid-cols-4{% else %}lg:grid-cols-3{% endif %} gap-6"
           data-products-per-page="{{ products_per_page }}"
         >
           {% paginate collection.products by products_per_page %}
@@ -319,6 +318,18 @@
     .rating-filter.active span {
       color: var(--color-primary, #3b82f6);
     }
+    
+    /* Product Grid Responsive Styles */
+    #product-grid {
+      display: grid !important;
+      grid-template-columns:1fr 1fr 1fr;
+      gap: 1.5rem;
+    }
+    
+    #product-grid .product-item {
+      width: 100%;
+      min-width: 0;
+    }
   {% endstyle %}
 
 {% schema %}
@@ -352,31 +363,6 @@
       "max": 48,
       "step": 6,
       "default": 24
-    },
-    {
-      "type": "range",
-      "id": "desktop_columns",
-      "label": "Desktop Columns",
-      "min": 2,
-      "max": 4,
-      "step": 1,
-      "default": 3
-    },
-    {
-      "type": "select",
-      "id": "mobile_columns",
-      "label": "Mobile Columns",
-      "options": [
-        {
-          "value": "1",
-          "label": "1"
-        },
-        {
-          "value": "2",
-          "label": "2"
-        }
-      ],
-      "default": "1"
     },
     {
       "type": "header",
