@@ -59,6 +59,10 @@
     content_for 'block', type: '_header-menu', id: 'header-menu', variant: 'navigation_bar', transparent: transparent
   endcapture
 
+  capture mobile_menu_custom
+    render 'mobile-menu', section: section
+  endcapture
+
   capture actions
     render 'header-actions', customer_account_menu: section.settings.customer_account_menu, display_style: section.settings.actions_display_style, section: section
   endcapture
@@ -394,6 +398,8 @@
     </div>
   {% endif %}
 </header-component>
+
+{{ mobile_menu_custom }}
 
 <script
   src="{{ 'header.js' | asset_url }}"
@@ -1641,8 +1647,112 @@
       ],
       "default": "default",
       "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Menu Settings"
+    },
+    {
+      "type": "link_list",
+      "id": "mobile_menu",
+      "label": "Mobile Menu",
+      "default": "main-menu",
+      "info": "Select a menu for mobile navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "desktop_menu",
+      "label": "Desktop Menu",
+      "info": "Select a different menu for desktop (optional). If not selected, mobile menu will be used."
+    },
+    {
+      "type": "text",
+      "id": "menu_title",
+      "label": "Menu Title",
+      "default": "Product Categories"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Mobile Menu Logo",
+      "info": "Logo to display in mobile menu header. If not set, shop name will be shown."
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo Width",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "default": 150,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_login_button",
+      "label": "Show Login Button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "login_button_text",
+      "label": "Login Button Text",
+      "default": "Login / Signup"
+    },
+    {
+      "type": "text",
+      "id": "footer_text",
+      "label": "Footer Text",
+      "default": "MADE IN INDIA WITH PRIDE"
     }
   ],
-  "presets": []
-}
+  "blocks": [
+    {
+      "type": "promotion",
+      "name": "Promotion Banner",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon Name",
+          "info": "Material Symbol icon name (e.g., 'sell', 'local_offer')"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Special Offer"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Festive Sale: Up to 40% Off"
+        }
+      ]
+    },
+    {
+      "type": "utility",
+      "name": "Utility Link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon Name",
+          "info": "Material Symbol icon name (e.g., 'package_2', 'help_center')"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Track Order"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
 {% endschema %}
